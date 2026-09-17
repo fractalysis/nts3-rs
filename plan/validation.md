@@ -81,16 +81,18 @@ sections, symbols and relocations. Keep normalized golden outputs in `tests/`.
 Every release/CI build runs:
 
 ```bash
-cargo test --workspace
-cargo check -p smooth-echo-nts3-plug --target thumbv7em-none-eabihf
-cargo nts3 build -p pass-through --release
-cargo nts3 build -p touch-probe --release
-cargo nts3 build -p smooth-echo-nts3-plug --release
-cargo nts3 inspect <each artifact>
+./container/run.sh cargo test --workspace
+./nts3 check -p smooth-echo-nts3-plug
+./nts3 build -p pass-through --release
+./nts3 build -p touch-probe --release
+./nts3 build -p smooth-echo-nts3-plug --release
+./nts3 inspect <each artifact>
 ```
 
-Execute Docker through Bash. On Git Bash set `MSYS_NO_PATHCONV=1` for raw Docker
-commands.
+The repository-root Bash launcher is the only public build CLI. Only the Bash
+launch layer (`nts3` and its lower-level container helper) invokes Docker. On
+Windows, execute it from WSL2 with Docker integration. Native Windows shells
+and Git Bash are outside the supported workflow.
 
 Fail on any artifact invariant or memory limit. Save `.map`, readelf summary and
 memory JSON as CI artifacts.

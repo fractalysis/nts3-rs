@@ -15,8 +15,9 @@ numeric order, assigning each file to a fresh LLM context.
 4. Change your row to `IN_PROGRESS` before implementation.
 5. Implement only the task's scope, but fix prerequisite defects that directly
    prevent it. Record such fixes.
-6. Run every command in the task's **Acceptance checks**. Run all Docker commands
-   from Bash; with Git Bash use `MSYS_NO_PATHCONV=1` for raw `docker` commands.
+6. Run every command in the task's **Acceptance checks**. Invoke Docker only
+   through the repository's Bash launchers. On Windows use WSL2 with Docker
+   integration; native Windows shells and Git Bash are not supported.
 7. Write `plan/agents/handoffs/NN-<task>.md` containing:
    - summary and design decisions;
    - files added/changed;

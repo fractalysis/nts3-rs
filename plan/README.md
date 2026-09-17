@@ -64,11 +64,12 @@ crates/
   nts3-sys/                        # audited raw ABI types/constants
   nts3-macros/                     # Params derive and plugin export attribute
   nts3/                            # safe facade, runtime, allocator, buffers
-  cargo-nts3/                      # build/inspect/doctor/new CLI
+  nts3-cli/                        # internal container-side Rust tooling engine
+nts3                               # public Bash build/inspect/doctor/new launcher
 container/
   Dockerfile                       # pinned Korg image + pinned Rust
   README.md
-  run.sh                           # Bash-only Docker launcher
+  run.sh                           # lower-level Bash container helper
 example/
   smooth-echo-nih-plug/            # unchanged reference
   smooth-echo-nts3-plug/           # must compile unchanged
@@ -87,14 +88,13 @@ docs/
 
 ## Definition of done
 
-1. `cargo test --workspace` passes on the host.
-2. `cargo check -p smooth-echo-nts3-plug --target thumbv7em-none-eabihf`
-   succeeds with no `std` linkage.
-3. `cargo nts3 build -p smooth-echo-nts3-plug --release` creates a stripped
+1. `./container/run.sh cargo test --workspace` passes in the pinned container.
+2. `./nts3 check -p smooth-echo-nts3-plug` succeeds with no `std` linkage.
+3. `./nts3 build -p smooth-echo-nts3-plug --release` creates a stripped
    `.nts3unit`, linker map, and JSON/human memory reports reproducibly through
    the Docker environment.
-4. `cargo nts3 inspect` validates ABI, header, exports, relocations, and all
-   known memory limits; malformed fixture ELFs are rejected by tests.
+4. `./nts3 inspect` validates ABI, header, exports, relocations, and all known
+   memory limits; malformed fixture ELFs are rejected by tests.
 5. The generated header exactly matches SDK C layout and all eight parameter
    descriptors/default mappings are correct.
 6. The native initialization probe reports actual allocator high-water use

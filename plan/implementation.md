@@ -9,8 +9,9 @@
 - [ ] Pin SDK API 2.0 sources already under `external/logue-sdk` and FunDSP
       0.21.0.
 - [ ] Build Korg `dummy-genericfx` through Bash as the environment smoke test.
-- [ ] Never invoke Docker through PowerShell. On Git Bash/Windows use
-      `MSYS_NO_PATHCONV=1` so `/app/...` paths are not rewritten.
+- [ ] Invoke Docker only from the repository Bash launcher. On Windows, support
+      WSL2 with Docker integration; do not support native Windows shells or Git
+      Bash and do not add cross-environment path conversion.
 
 ## Phase 1 — Hard-gate Rust ELF spike
 
@@ -126,29 +127,37 @@ At this point, make `example/smooth-echo-nts3-plug/src/lib.rs` type-check
 unchanged. If the public API must change for soundness, update the architecture
 document first; do not add boilerplate merely to simplify macro implementation.
 
-## Phase 6 — `cargo-nts3` and container
+## Phase 6 — Bash launcher, Rust tooling engine and container
 
 Commands:
 
-- [ ] `cargo nts3 doctor`: check Docker/image, SDK mount, Rust target, GNU tools,
-      versions and path conversion.
-- [ ] `cargo nts3 check [-p package]`: target `cargo check` with correct features.
-- [ ] `cargo nts3 build [-p package] --release`: build archive, final-link,
-      strip, validate, package and report.
-- [ ] `cargo nts3 inspect <artifact>`: validate an existing ELF/unit without
+- [ ] `./nts3 doctor`: check Docker/image and mounts from Bash, then check the
+      Rust target, Cargo, GNU tools and versions inside the container.
+- [ ] `./nts3 check [-p package]`: target `cargo check` with correct features.
+- [ ] `./nts3 build [-p package] --release`: build archive, final-link, strip,
+      validate, package and report.
+- [ ] `./nts3 inspect <artifact>`: validate an existing ELF/unit without
       rebuilding.
-- [ ] `cargo nts3 new <name>`: generate a minimal plugin containing only a
-      params struct, DSP struct and trait impl—never copied ABI boilerplate.
+- [ ] `./nts3 new <name>`: generate a minimal plugin containing only a params
+      struct, DSP struct and trait impl—never copied ABI boilerplate.
 
 Implementation requirements:
 
+- [ ] Make the repository-root `nts3` Bash launcher the only public build CLI;
+      do not implement or document `cargo nts3`.
 - [ ] Default to the pinned Docker image for reproducibility; provide an explicit
-      expert local mode.
-- [ ] All generated commands and scripts invoke Docker from Bash.
+      expert local mode through the same launcher.
+- [ ] Only the Bash launch layer invokes Docker; `nts3` may delegate to
+      `container/run.sh`. The internal `crates/nts3-cli` Rust engine runs inside
+      the container and never launches Docker.
+- [ ] Support Bash on Linux/macOS and WSL2 on Windows. Do not add Git Bash,
+      PowerShell, `cmd.exe`, `wsl.exe`, `cygpath` or MSYS path-conversion paths.
+- [ ] The default flow requires only Bash and Docker on the calling system;
+      Cargo, Rust and GNU tools execute inside the container.
 - [ ] Forward Cargo diagnostics and return exact nonzero status.
 - [ ] Use workspace/target caches without baking host-specific paths into ELF.
 - [ ] Produce deterministic file names and a `--verbose` command transcript.
-- [ ] Keep compiler/linker policy in this tool, not each plugin's Cargo.toml.
+- [ ] Keep compiler/linker policy in tooling, not each plugin's Cargo.toml.
 - [ ] Ensure plugin authors do not need `.cargo/config`, a linker script,
       `build.rs`, C source, or a crate-type stanza.
 

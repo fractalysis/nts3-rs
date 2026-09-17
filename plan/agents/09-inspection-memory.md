@@ -2,7 +2,7 @@
 
 ## Context
 
-Add `cargo nts3 inspect` and mandatory post-build validation. Static ELF usage is
+Add `./nts3 inspect` and mandatory post-build validation. Static ELF usage is
 measurable; dynamic SDRAM behavior is not inferable solely from machine code.
 The attribute embeds the exact declared arena in `.nts3_resources`, while a
 native initialization probe measures allocator high-water. Stack and real-time
@@ -24,8 +24,9 @@ ELFs before selecting an ELF parser.
 
 ## Task
 
-1. Implement host-only `cargo nts3 inspect <artifact>` using a maintained ELF
-   parser and wire it as mandatory final step of `build`.
+1. Implement `./nts3 inspect <artifact>` in the container-side Rust tooling
+   engine using a maintained ELF parser and wire it as the mandatory final step
+   of `build`. Expert local mode may run the same engine on the host.
 2. Validate class/data/machine/type/OSABI/EABI/hard-float, target/API/header,
    required exports, program headers, alignments, undefined symbols,
    relocations/PLT and prohibited/debug/unwind baggage.
@@ -44,7 +45,7 @@ ELFs before selecting an ELF parser.
 
 ## Deliverables
 
-- Inspector integrated into `cargo-nts3`
+- Inspector integrated into `crates/nts3-cli` and exposed only through `./nts3`
 - Versioned memory JSON schema and text output
 - Native high-water/size probe
 - Invalid ELF fixture tests

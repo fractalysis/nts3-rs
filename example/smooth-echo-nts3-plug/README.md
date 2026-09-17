@@ -11,12 +11,17 @@ tooling have been implemented.
 
 ## Intended commands
 
+Run from the repository root in Bash (WSL2 on Windows):
+
 ```bash
-cargo nts3 check
-cargo nts3 build --release
-cargo nts3 inspect target/nts3/smooth_echo.nts3unit
-cargo test
+./nts3 check -p smooth-echo-nts3-plug
+./nts3 build -p smooth-echo-nts3-plug --release
+./nts3 inspect target/nts3/smooth_echo.nts3unit
+./container/run.sh cargo test --workspace
 ```
+
+The public build interface is the Bash launcher; no host Cargo installation or
+`cargo nts3` command is required.
 
 The build command should produce both:
 

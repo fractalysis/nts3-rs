@@ -26,8 +26,9 @@ Use these established patterns deliberately:
   drop it before returning the arena to Korg. The process-global singleton is
   unavoidable because the SDK ABI is global, but it must be isolated inside the
   generated adapter.
-- **Fail fast at compile/build time:** macros validate metadata and `cargo-nts3`
-  validates artifacts. Avoid runtime checks in the audio loop.
+- **Fail fast at compile/build time:** macros validate metadata and the
+  `./nts3` build tooling validates artifacts. Avoid runtime checks in the audio
+  loop.
 
 Do not introduce an abstract host model copied from desktop plugin frameworks.
 The NTS-3 has one fixed stereo geometry and a small callback API.
@@ -257,7 +258,11 @@ handler exactly once.
 - `nts3-sys`: no logic, no allocation, no macros.
 - `nts3-macros`: host-only `syn`/`quote`; compile-time validation and codegen.
 - `nts3`: public facade and target runtime. Keep dependencies minimal.
-- `cargo-nts3`: host CLI, Docker orchestration, ELF inspection and reports.
+- Repository-root `nts3`: public Bash launcher. The Bash launch layer may use
+  `container/run.sh` internally and is the sole owner of Docker orchestration.
+- `nts3-cli`: tooling-only Rust engine, run inside the pinned container by
+  default; owns Cargo/GNU build policy, ELF inspection and reports, but never
+  invokes Docker.
 
-This separation prevents proc-macro dependencies and ELF parser code from
-entering the hardware artifact.
+This separation prevents proc-macro and tooling dependencies from entering the
+hardware artifact while avoiding any native-Windows-to-WSL process bridge.

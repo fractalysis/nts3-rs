@@ -24,7 +24,7 @@ memory reports. Run pass-through and touch-probe full builds first.
 
 ## Task
 
-1. Build/package `example/smooth-echo-nts3-plug` through `cargo nts3` with
+1. Build/package `example/smooth-echo-nts3-plug` through `./nts3` with
    FunDSP exactly 0.21.0/default-features=false.
 2. Add host DSP tests for silence, impulse timing, parameter sweeps, feedback
    boundary/freeze, reset retention, finite/bounded long random runs and

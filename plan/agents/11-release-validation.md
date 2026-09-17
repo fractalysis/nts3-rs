@@ -31,8 +31,9 @@ means “known unverified,” never “passed.”
    leakage, threads/locks/JSON and unnecessary code.
 4. Audit all unsafe blocks for safety comments and focused coverage. Run Miri on
    supported buffer/state tests.
-5. Verify `cargo nts3 doctor/check/build/inspect/new` documentation and execute
-   the quickstart exactly as a new plugin author would.
+5. Verify `./nts3 doctor/check/build/inspect/new` documentation and execute the
+   Bash/WSL2 quickstart exactly as a new plugin author would. Confirm no
+   `cargo nts3` command is documented or required.
 6. Ensure docs explain parameters, Baseplug-derived one-pole smoothing semantics,
    touch, memory categories, IDs, Docker Bash requirement, troubleshooting,
    stack/CPU unknowns and hardware status. Verify copied/adapted Baseplug code
