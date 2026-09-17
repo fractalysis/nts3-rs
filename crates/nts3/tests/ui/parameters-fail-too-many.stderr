@@ -1,0 +1,5 @@
+error: NTS-3 supports at most 8 parameters; found 9
+ --> tests/ui/parameters-fail-too-many.rs:4:8
+  |
+4 | struct TooMany {
+  |        ^^^^^^^

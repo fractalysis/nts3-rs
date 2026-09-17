@@ -1,0 +1,11 @@
+error: duplicate parameter index 0
+ --> tests/ui/parameters-fail-duplicate-index.rs:5:5
+  |
+5 |     #[parameter(index=0, name="B", min=0, max=1, default=0, parameter_type="none")] b: Parameter,
+  |     ^
+
+error: first used here
+ --> tests/ui/parameters-fail-duplicate-index.rs:4:5
+  |
+4 |     #[parameter(index=0, name="A", min=0, max=1, default=0, parameter_type="none")] a: Parameter,
+  |     ^

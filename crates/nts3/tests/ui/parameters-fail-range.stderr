@@ -1,0 +1,5 @@
+error: parameter range is invalid: `min` must be less than or equal to `max`
+ --> tests/ui/parameters-fail-range.rs:4:33
+  |
+4 |     #[parameter(name="BAD", min=10, max=1, default=5, parameter_type="none")]
+  |                                 ^^

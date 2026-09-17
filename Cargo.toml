@@ -2,7 +2,9 @@
 resolver = "2"
 members = [
     "crates/nts3-sys",
+    "crates/nts3-macros",
     "crates/nts3",
+    "fixtures/parameter-derive",
     "fixtures/pass-through",
     "fixtures/touch-probe",
 ]

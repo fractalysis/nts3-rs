@@ -1,0 +1,5 @@
+error: unsupported parameter_type `bananas`
+ --> tests/ui/parameters-fail-display.rs:4:69
+  |
+4 |     #[parameter(name="BAD", min=0, max=1, default=0, parameter_type="bananas")]
+  |                                                                     ^^^^^^^^^

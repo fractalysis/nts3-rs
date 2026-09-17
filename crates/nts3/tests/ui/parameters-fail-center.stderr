@@ -1,0 +1,5 @@
+error: `center` must be inside the parameter range -10..=10
+ --> tests/ui/parameters-fail-center.rs:4:53
+  |
+4 |     #[parameter(name="BAD", min=-10, max=10, center=11, default=0, parameter_type="none")]
+  |                                                     ^^

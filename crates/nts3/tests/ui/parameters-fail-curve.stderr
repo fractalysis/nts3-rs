@@ -1,0 +1,5 @@
+error: unsupported curve `spline`
+ --> tests/ui/parameters-fail-curve.rs:4:83
+  |
+4 |     #[parameter(name="BAD", min=0, max=1, default=0, parameter_type="none", curve="spline")]
+  |                                                                                   ^^^^^^^^

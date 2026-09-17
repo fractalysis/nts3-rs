@@ -11,7 +11,7 @@ handoff when finished or blocked.
 | 03 SDRAM allocator | DONE | [handoff](handoffs/03-sdram-allocator.md) |
 | 04 Runtime adapters | DONE | [handoff](handoffs/04-runtime-adapters.md) |
 | 05 Parameter core | DONE | [handoff](handoffs/05-parameter-core.md) |
-| 06 Parameter derive | NOT_STARTED | — |
+| 06 Parameter derive | DONE | [handoff](handoffs/06-parameter-derive.md) |
 | 07 Plugin export | NOT_STARTED | — |
 | 08 Build CLI | NOT_STARTED | — |
 | 09 Inspection and memory | NOT_STARTED | — |

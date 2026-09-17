@@ -18,6 +18,7 @@ mod touch;
 
 pub use allocator::AllocationStats;
 pub use buffer::{BufferError, StereoBuffer, StereoFrame, StereoFramesMut, StereoInput};
+pub use nts3_macros::Nts3Parameters;
 pub use parameter::{
     Nts3Parameters, Parameter, ParameterError, Smooth, SmoothStatus, SmoothedParameter,
 };
@@ -27,6 +28,11 @@ pub use touch::{TouchEvent, TouchPhase};
 /// Implementation details used by generated code and internal fixtures.
 #[doc(hidden)]
 pub mod __private {
+    pub use nts3_sys::{
+        GenericfxCurve, GenericfxParamMapping, UNUSED_MAPPING, UNUSED_PARAM, UnitParam,
+        UnitParamFormat,
+    };
+
     pub trait Sealed {}
 }
 

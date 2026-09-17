@@ -1,0 +1,5 @@
+error: unsupported parameter field type; expected Parameter or SmoothedParameter
+ --> tests/ui/parameters-fail-field-type.rs:5:12
+  |
+5 |     value: i16,
+  |            ^^^

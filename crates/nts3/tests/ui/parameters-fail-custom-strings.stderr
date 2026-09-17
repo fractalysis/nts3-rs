@@ -1,0 +1,5 @@
+error: unsupported parameter_type `strings`
+ --> tests/ui/parameters-fail-custom-strings.rs:4:70
+  |
+4 |     #[parameter(name="MODE", min=0, max=1, default=0, parameter_type="strings")]
+  |                                                                      ^^^^^^^^^

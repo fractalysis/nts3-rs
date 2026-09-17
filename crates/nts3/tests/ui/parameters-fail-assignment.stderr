@@ -1,0 +1,5 @@
+error: unsupported assign `z`
+ --> tests/ui/parameters-fail-assignment.rs:4:84
+  |
+4 |     #[parameter(name="BAD", min=0, max=1, default=0, parameter_type="none", assign="z")]
+  |                                                                                    ^^^

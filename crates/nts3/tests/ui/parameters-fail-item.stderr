@@ -1,0 +1,5 @@
+error: Nts3Parameters can only be derived for structs
+ --> tests/ui/parameters-fail-item.rs:3:6
+  |
+3 | enum NotAParameterStruct {
+  |      ^^^^^^^^^^^^^^^^^^^

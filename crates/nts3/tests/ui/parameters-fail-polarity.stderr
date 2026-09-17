@@ -1,0 +1,5 @@
+error: unsupported curve_polarity `alternating`
+ --> tests/ui/parameters-fail-polarity.rs:4:92
+  |
+4 |     #[parameter(name="BAD", min=0, max=1, default=0, parameter_type="none", curve_polarity="alternating")]
+  |                                                                                            ^^^^^^^^^^^^^

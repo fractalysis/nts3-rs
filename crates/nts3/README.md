@@ -10,12 +10,15 @@ Target-safe framework core for Korg NTS-3 `genericfx` units.
   buffers without exposing aliased references;
 - typed `TouchPhase`/`TouchEvent` values with raw, clamped, and normalized
   positions independent of active state;
-- compact integer-backed `Parameter` and per-sample `SmoothedParameter` values.
+- compact integer-backed `Parameter` and per-sample `SmoothedParameter` values;
+- the host-only `Nts3Parameters` derive, reexported through the facade/prelude.
 
 The runtime validates the SDK descriptor before state construction, owns plugin
 and parameter state, refreshes optional raw input for each render, bounds frame
 counts, and dispatches all lifecycle and parameter callbacks. Generated code
-implements the sealed `Nts3Parameters` metadata/dispatch contract.
+implements the sealed `Nts3Parameters` metadata/dispatch contract. Parameter
+attribute syntax, validation, and index/preset stability are documented in
+[`../../docs/parameters.md`](../../docs/parameters.md).
 
 Smoothing is a `no_std` adaptation of wrl/baseplug's MIT-licensed one-pole
 algorithm. `smoothing_ms` is an exponential time constant (about 36.8% error

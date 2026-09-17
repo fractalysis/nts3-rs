@@ -1,0 +1,5 @@
+error: `mapping_min` must be inside the parameter range 0..=10
+ --> tests/ui/parameters-fail-mapping.rs:4:90
+  |
+4 |     #[parameter(name="BAD", min=0, max=10, default=5, parameter_type="none", mapping_min=-1)]
+  |                                                                                          ^

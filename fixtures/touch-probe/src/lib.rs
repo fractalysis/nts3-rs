@@ -16,13 +16,8 @@ pub(crate) struct TouchProbe {
     normalized_position: [f32; 2],
 }
 
-// Temporary private parameter stub until the Task 05/06 parameter engine and
-// derive replace this internal fixture implementation.
-#[derive(Default)]
-struct ProbeParameters;
-
-impl nts3::__private::Sealed for ProbeParameters {}
-impl Nts3Parameters for ProbeParameters {}
+#[derive(Nts3Parameters)]
+struct ProbeParameters {}
 
 impl Nts3Plugin for TouchProbe {
     type Parameters = ProbeParameters;

@@ -1,0 +1,5 @@
+error: smoothing_ms must be a finite number greater than zero
+ --> tests/ui/parameters-fail-smoothing-value.rs:4:90
+  |
+4 |     #[parameter(name="BAD", min=0, max=1, default=0, parameter_type="none", smoothing_ms=0.0)]
+  |                                                                                          ^^^

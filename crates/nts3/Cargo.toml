@@ -8,7 +8,11 @@ publish = false
 
 [dependencies]
 libm = "0.2.15"
+nts3-macros = { path = "../nts3-macros" }
 nts3-sys = { path = "../nts3-sys" }
+
+[dev-dependencies]
+trybuild = "=1.0.103"
 
 [[example]]
 name = "allocating-probe"

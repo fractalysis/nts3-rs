@@ -1,0 +1,5 @@
+error: decimal_places must be in 0..=15
+ --> tests/ui/parameters-fail-fraction-range.rs:4:92
+  |
+4 |     #[parameter(name="BAD", min=0, max=1, default=0, parameter_type="none", decimal_places=16)]
+  |                                                                                            ^^

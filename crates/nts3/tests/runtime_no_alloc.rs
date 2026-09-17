@@ -55,10 +55,17 @@ unsafe extern "C" fn available() -> usize {
     4096
 }
 
-#[derive(Default)]
-struct Parameters;
-impl nts3::__private::Sealed for Parameters {}
-impl Nts3Parameters for Parameters {}
+#[derive(Nts3Parameters)]
+struct Parameters {
+    #[parameter(
+        name = "LEVEL",
+        min = 0,
+        max = 100,
+        default = 50,
+        parameter_type = "percent"
+    )]
+    _level: Parameter,
+}
 
 #[derive(Default)]
 struct Probe;
@@ -118,6 +125,9 @@ fn every_post_init_runtime_path_allocates_zero_bytes() {
         }
     });
     assert_eq!(output, input);
+    assert_eq!(assert_no_alloc(|| controller.get_parameter(0)), 50);
+    assert!(assert_no_alloc(|| controller.set_parameter(0, i32::MAX)));
+    assert_eq!(assert_no_alloc(|| controller.get_parameter(0)), 100);
     assert_eq!(assert_no_alloc(|| controller.get_parameter(255)), 0);
     assert!(!assert_no_alloc(|| controller.set_parameter(255, i32::MAX)));
     assert!(assert_no_alloc(|| controller.parameter_string_value(255, 0)).is_null());

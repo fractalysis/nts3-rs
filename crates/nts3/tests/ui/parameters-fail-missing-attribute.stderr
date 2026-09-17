@@ -1,0 +1,5 @@
+error: each parameter field requires exactly one #[parameter(...)] attribute
+ --> tests/ui/parameters-fail-missing-attribute.rs:4:5
+  |
+4 |     value: Parameter,
+  |     ^^^^^

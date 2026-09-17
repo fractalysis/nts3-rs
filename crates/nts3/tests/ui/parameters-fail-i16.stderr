@@ -1,0 +1,5 @@
+error: `max` must fit the NTS-3 signed 16-bit value range
+ --> tests/ui/parameters-fail-i16.rs:4:40
+  |
+4 |     #[parameter(name="BAD", min=0, max=40000, default=0, parameter_type="none")]
+  |                                        ^^^^^
