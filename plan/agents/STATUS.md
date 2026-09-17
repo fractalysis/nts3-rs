@@ -6,7 +6,7 @@ handoff when finished or blocked.
 
 | Task | State | Handoff / blocker |
 |---|---|---|
-| 01 Toolchain and ELF spike | IN_PROGRESS | — |
+| 01 Toolchain and ELF spike | DONE | [handoff](handoffs/01-toolchain-elf-spike.md) |
 | 02 Raw ABI | NOT_STARTED | — |
 | 03 SDRAM allocator | NOT_STARTED | — |
 | 04 Runtime adapters | NOT_STARTED | — |

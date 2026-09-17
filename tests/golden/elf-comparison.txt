@@ -1,0 +1,61 @@
+NTS-3 C dummy / Rust pass-through comparison
+============================================
+
+Reproducible Rust SHA-256: 8f2f70bcc64d54b394692eede58573fc3620032fff935ccd5ec44d26fdeae5a6
+Rust artifact bytes: 3648
+Rust writable PT_LOAD memory bytes: 116
+
+GNU size (stripped artifacts):
+   text	   data	    bss	    dec	    hex	filename
+   3834	    292	     60	   4186	   105a	<WORKSPACE>/target/nts3/pass-through/c-dummy/dummy_genericfx.nts3unit
+   1529	    100	      4	   1633	    661	<WORKSPACE>/target/nts3/pass-through/pass_through.nts3unit
+
+Relocations:
+-- C dummy --
+
+Relocation section '.rel.plt' at offset 0x9a4 contains 2 entries:
+ Offset     Info    Type                Sym. Value  Symbol's Name
+00001084  00002016 R_ARM_JUMP_SLOT        00000c45   _ZN6Effect7processEPKfPfm
+00001088  00002f16 R_ARM_JUMP_SLOT        00000ba9   _ZN6Effect12setParameterEhl
+
+Relocation section '.rel.dyn' at offset 0x8d4 contains 26 entries:
+ Offset     Info    Type                Sym. Value  Symbol's Name
+00000fd0  00000017 R_ARM_RELATIVE        
+000010e8  00000017 R_ARM_RELATIVE        
+000010ec  00000017 R_ARM_RELATIVE        
+000010f0  00000017 R_ARM_RELATIVE        
+000010f4  00000017 R_ARM_RELATIVE        
+0000108c  00000e15 R_ARM_GLOB_DAT         00001098   _ZTV6Effect
+00001090  00002415 R_ARM_GLOB_DAT         000010e8   _ZZNK6Effect20getParameterStrValueEhlE14param4_strings
+00001094  00002815 R_ARM_GLOB_DAT         00000ce0   unit_header
+000010a0  00001902 R_ARM_ABS32            00000ba1   _ZNK6Effect13getBufferSizeEv
+000010a4  00002902 R_ARM_ABS32            00000c2d   _ZN6Effect4initEPf
+000010a8  00002002 R_ARM_ABS32            00000c45   _ZN6Effect7processEPKfPfm
+000010ac  00000802 R_ARM_ABS32            00000c3d   _ZN6Effect8teardownEv
+000010b0  00002f02 R_ARM_ABS32            00000ba9   _ZN6Effect12setParameterEhl
+000010b4  00002702 R_ARM_ABS32            00000c09   _ZNK6Effect20getParameterStrValueEhl
+000010b8  00001702 R_ARM_ABS32            00000b75   _ZN9Processor5resetEv
+000010bc  00000d02 R_ARM_ABS32            00000b79   _ZN9Processor6resumeEv
+000010c0  00001202 R_ARM_ABS32            00000b7d   _ZN9Processor7suspendEv
+000010c4  00002602 R_ARM_ABS32            00000b81   _ZN9Processor6noteOnEhh
+000010c8  00001102 R_ARM_ABS32            00000b85   _ZN9Processor7noteOffEh
+000010cc  00000a02 R_ARM_ABS32            00000b89   _ZN9Processor10allNoteOffEv
+000010d0  00000702 R_ARM_ABS32            00000c69   _ZN6Effect10touchEventEhhmm
+000010d4  00003102 R_ARM_ABS32            00000b8d   _ZN9Processor9pitchBendEh
+000010d8  00001a02 R_ARM_ABS32            00000b91   _ZN9Processor15channelPressureEh
+000010dc  00001c02 R_ARM_ABS32            00000b95   _ZN9Processor10aftertouchEhh
+000010e0  00002e02 R_ARM_ABS32            00000b99   _ZN9Processor8setTempoEf
+000010e4  00001002 R_ARM_ABS32            00000b9d   _ZN9Processor14tempo4ppqnTickEm
+-- Rust pass-through --
+
+There are no relocations in this file.
+
+PLT sections:
+-- C dummy --
+  [ 4] .rel.plt          REL             000009a4 0009a4 000010 08  AI  2  11  4
+  [ 6] .plt              PROGBITS        00000cb0 000cb0 000030 04  AX  0   0  4
+-- Rust pass-through --
+  [ 4] .rel.plt          REL             000004a8 0004a8 000000 08  AI  2  22  4
+
+Result: Rust has no undefined dynamic symbols, call relocations, or PLT.
+Therefore no ARM-mode PLT is reachable from its Thumb callbacks; --long-plt is unnecessary for this fixture.

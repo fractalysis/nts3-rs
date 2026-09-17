@@ -1,0 +1,412 @@
+
+Discarded input sections
+
+ .group         0x0000000000000000        0x8 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ .group         0x0000000000000000        0x8 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ .group         0x0000000000000000        0x8 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ .group         0x0000000000000000        0x8 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ .group         0x0000000000000000        0x8 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ .group         0x0000000000000000        0x8 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ .group         0x0000000000000000        0x8 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ .group         0x0000000000000000        0x8 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ .group         0x0000000000000000        0x8 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ .group         0x0000000000000000        0x8 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ .group         0x0000000000000000        0x8 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ .group         0x0000000000000000        0x8 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ .group         0x0000000000000000        0x8 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ .group         0x0000000000000000        0xc <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ .group         0x0000000000000000        0x8 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ .group         0x0000000000000000        0x8 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ .group         0x0000000000000000        0x8 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ .group         0x0000000000000000        0x8 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ .group         0x0000000000000000        0xc <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ .group         0x0000000000000000        0xc <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+LOAD <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+LOAD <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+LOAD <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x0000000000000000                __heap_size = 0x0
+                0x0000000000000000                __stack_size = 0x0
+                0x00000000000000d4                . = SIZEOF_HEADERS
+
+.hash           0x00000000000000d4      0x164
+ *(.hash)
+ .hash          0x00000000000000d4      0x164 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+
+.dynsym         0x0000000000000238      0x320
+ *(.dynsym)
+ .dynsym        0x0000000000000238      0x320 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+
+.dynstr         0x0000000000000558      0x37a
+ *(.dynstr)
+ .dynstr        0x0000000000000558      0x37a <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+
+.rel.dyn        0x00000000000008d4       0xd0
+ *(.rel.dyn)
+ .rel.got       0x00000000000008d4       0x18 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+ .rel.iplt      0x00000000000008ec        0x0 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+ .rel.init_array
+                0x00000000000008ec        0x8 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+ .rel.data.rel.ro._ZTV6Effect
+                0x00000000000008f4       0x90 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+ .rel.data.rel.local._ZZNK6Effect20getParameterStrValueEhlE14param4_strings
+                0x0000000000000984       0x20 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+
+.rel.plt        0x00000000000009a4       0x10
+ *(.rel.plt)
+ .rel.plt       0x00000000000009a4       0x10 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+
+.text           0x00000000000009b4      0x2fc
+ *(.text)
+ .text          0x00000000000009b4        0x0 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+ .text          0x00000000000009b4       0x20 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+ .text          0x00000000000009d4      0x1a0 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x00000000000009d4                unit_init
+                0x0000000000000aa8                unit_teardown
+                0x0000000000000ab8                unit_reset
+                0x0000000000000aba                unit_resume
+                0x0000000000000abc                unit_suspend
+                0x0000000000000abe                unit_render
+                0x0000000000000ad4                unit_set_param_value
+                0x0000000000000b18                unit_get_param_value
+                0x0000000000000b28                unit_get_param_str_value
+                0x0000000000000b6c                unit_touch_event
+                0x0000000000000b6e                unit_set_tempo
+                0x0000000000000b70                unit_tempo_4ppqn_tick
+ *(.text.*)
+ .text._ZN9Processor5resetEv
+                0x0000000000000b74        0x2 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x0000000000000b74                Processor::reset()
+ *fill*         0x0000000000000b76        0x2 
+ .text._ZN9Processor6resumeEv
+                0x0000000000000b78        0x2 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x0000000000000b78                Processor::resume()
+ *fill*         0x0000000000000b7a        0x2 
+ .text._ZN9Processor7suspendEv
+                0x0000000000000b7c        0x2 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x0000000000000b7c                Processor::suspend()
+ *fill*         0x0000000000000b7e        0x2 
+ .text._ZN9Processor6noteOnEhh
+                0x0000000000000b80        0x2 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x0000000000000b80                Processor::noteOn(unsigned char, unsigned char)
+ *fill*         0x0000000000000b82        0x2 
+ .text._ZN9Processor7noteOffEh
+                0x0000000000000b84        0x2 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x0000000000000b84                Processor::noteOff(unsigned char)
+ *fill*         0x0000000000000b86        0x2 
+ .text._ZN9Processor10allNoteOffEv
+                0x0000000000000b88        0x2 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x0000000000000b88                Processor::allNoteOff()
+ *fill*         0x0000000000000b8a        0x2 
+ .text._ZN9Processor9pitchBendEh
+                0x0000000000000b8c        0x2 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x0000000000000b8c                Processor::pitchBend(unsigned char)
+ *fill*         0x0000000000000b8e        0x2 
+ .text._ZN9Processor15channelPressureEh
+                0x0000000000000b90        0x2 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x0000000000000b90                Processor::channelPressure(unsigned char)
+ *fill*         0x0000000000000b92        0x2 
+ .text._ZN9Processor10aftertouchEhh
+                0x0000000000000b94        0x2 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x0000000000000b94                Processor::aftertouch(unsigned char, unsigned char)
+ *fill*         0x0000000000000b96        0x2 
+ .text._ZN9Processor8setTempoEf
+                0x0000000000000b98        0x2 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x0000000000000b98                Processor::setTempo(float)
+ *fill*         0x0000000000000b9a        0x2 
+ .text._ZN9Processor14tempo4ppqnTickEm
+                0x0000000000000b9c        0x2 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x0000000000000b9c                Processor::tempo4ppqnTick(unsigned long)
+ *fill*         0x0000000000000b9e        0x2 
+ .text._ZNK6Effect13getBufferSizeEv
+                0x0000000000000ba0        0x6 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x0000000000000ba0                Effect::getBufferSize() const
+ *fill*         0x0000000000000ba6        0x2 
+ .text._ZN6Effect12setParameterEhl
+                0x0000000000000ba8       0x60 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x0000000000000ba8                Effect::setParameter(unsigned char, long)
+ .text._ZNK6Effect20getParameterStrValueEhl
+                0x0000000000000c08       0x24 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x0000000000000c08                Effect::getParameterStrValue(unsigned char, long) const
+ .text._ZN6Effect4initEPf
+                0x0000000000000c2c       0x10 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x0000000000000c2c                Effect::init(float*)
+ .text._ZN6Effect8teardownEv
+                0x0000000000000c3c        0x6 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x0000000000000c3c                Effect::teardown()
+ *fill*         0x0000000000000c42        0x2 
+ .text._ZN6Effect7processEPKfPfm
+                0x0000000000000c44       0x22 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x0000000000000c44                Effect::process(float const*, float*, unsigned long)
+ *fill*         0x0000000000000c66        0x2 
+ .text._ZN6Effect10touchEventEhhmm
+                0x0000000000000c68        0x2 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x0000000000000c68                Effect::touchEvent(unsigned char, unsigned char, unsigned long, unsigned long)
+ *fill*         0x0000000000000c6a        0x2 
+ .text.startup  0x0000000000000c6c       0x2c <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ *(.init)
+ *(.fini)
+ *crtbegin.o(.ctors)
+ *crtbegin?.o(.ctors)
+ *(EXCLUDE_FILE(*crtend.o *crtend?.o) .ctors)
+ *(SORT_BY_NAME(.ctors.*))
+ *(.ctors)
+ *(.rodata)
+ *(.rodata.*)
+ .rodata.str1.1
+                0x0000000000000c98       0x18 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+
+.glue_7         0x0000000000000cb0        0x0
+ .glue_7        0x0000000000000cb0        0x0 linker stubs
+
+.glue_7t        0x0000000000000cb0        0x0
+ .glue_7t       0x0000000000000cb0        0x0 linker stubs
+
+.vfp11_veneer   0x0000000000000cb0        0x0
+ .vfp11_veneer  0x0000000000000cb0        0x0 linker stubs
+
+.v4_bx          0x0000000000000cb0        0x0
+ .v4_bx         0x0000000000000cb0        0x0 linker stubs
+
+.plt            0x0000000000000cb0       0x30
+ .plt           0x0000000000000cb0       0x30 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+
+.iplt           0x0000000000000ce0        0x0
+ .iplt          0x0000000000000ce0        0x0 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+
+.unit_header    0x0000000000000ce0      0x2f0
+                0x0000000000000ce0                . = ALIGN (0x8)
+ *(.unit_header)
+ .unit_header   0x0000000000000ce0      0x178 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+                0x0000000000000ce0                unit_header
+ .unit_header   0x0000000000000e58      0x178 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+
+.gnu.version_d  0x0000000000000fd0        0x0
+ .gnu.version_d
+                0x0000000000000fd0        0x0 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+
+.gnu.version    0x0000000000000fd0        0x0
+ .gnu.version   0x0000000000000fd0        0x0 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+
+.gnu.version_r  0x0000000000000fd0        0x0
+ .gnu.version_r
+                0x0000000000000fd0        0x0 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+
+.preinit_array  0x0000000000000fd0        0x0
+                0x0000000000000fd0                . = ALIGN (0x4)
+                [!provide]                        PROVIDE (__preinit_array_start = .)
+ *(.preinit_array)
+                [!provide]                        PROVIDE (__preinit_array_end = .)
+
+.init_array     0x0000000000000fd0        0x4
+                0x0000000000000fd0                . = ALIGN (0x4)
+                [!provide]                        PROVIDE (__init_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.init_array.*))
+ *(.init_array)
+ .init_array    0x0000000000000fd0        0x4 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                [!provide]                        PROVIDE (__init_array_end = .)
+
+.dynamic        0x0000000000000fd8       0xa0
+                0x0000000000000fd8                . = ALIGN (0x8)
+ *(.dynamic)
+ .dynamic       0x0000000000000fd8       0xa0 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+                0x0000000000000fd8                _DYNAMIC
+
+.got            0x0000000000001078       0x20
+ *(.got.plt)
+ .got.plt       0x0000000000001078       0x14 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+                0x0000000000001078                _GLOBAL_OFFSET_TABLE_
+ *(.igot.plt)
+ .igot.plt      0x000000000000108c        0x0 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+ *(.got)
+ .got           0x000000000000108c        0xc <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+ *(.igot)
+
+.data           0x0000000000001098       0x60
+                0x0000000000001098                . = ALIGN (0x4)
+                0x0000000000001098                __data_start__ = .
+ *(vtable)
+ *(.data)
+ .data          0x0000000000001098        0x0 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+ .data          0x0000000000001098        0x0 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+ .data          0x0000000000001098        0x0 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ *(.data.*)
+ .data.rel.ro   0x0000000000001098        0x0 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+ .data.rel.ro._ZTV6Effect
+                0x0000000000001098       0x50 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x0000000000001098                vtable for Effect
+ .data.rel.local._ZZNK6Effect20getParameterStrValueEhlE14param4_strings
+                0x00000000000010e8       0x10 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                0x00000000000010e8                Effect::getParameterStrValue(unsigned char, long) const::param4_strings
+                0x00000000000010f8                . = ALIGN (0x4)
+                0x00000000000010f8                __data_end__ = .
+
+.bss            0x00000000000010f8       0x38
+                0x00000000000010f8                . = ALIGN (0x4)
+                0x00000000000010f8                __bss_start__ = .
+ *(.bss)
+ .bss           0x00000000000010f8        0x0 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+ .bss           0x00000000000010f8        0x0 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+ .bss           0x00000000000010f8       0x38 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+ *(.bss.*)
+ *(COMMON)
+                0x0000000000001130                . = ALIGN (0x4)
+                0x0000000000001130                __bss_end__ = .
+
+.dynbss         0x0000000000001130        0x0
+ .dynbss        0x0000000000001130        0x0 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+
+.stack          0x0000000000001130        0x4
+                0x0000000000001130                . = ALIGN (0x10)
+                0x0000000000001130                __HEAP = .
+                0x0000000000001130                _end = .
+                0x0000000000001130                end = .
+                0x0000000000001130                . = (. + __heap_size)
+                0x0000000000001130                __HEAP_END = .
+                0x0000000000001130                _stack_end = .
+                0x0000000000001130                . = (. + __stack_size)
+                0x0000000000001130                _stack_addr = .
+                0x0000000000001130                __stack = .
+                0x0000000000001130                __SP_INIT = .
+                0x0000000000001134                . = (. + 0x4)
+ *fill*         0x0000000000001130        0x4 
+
+/DISCARD/
+ *(.fini_array.* .fini_array .dtors.* .dtors)
+ *(.note.GNU-stack)
+ *(.gnu_debuglink)
+ *(.gnu.lto_*)
+LOAD /usr/lib/gcc/arm-none-eabi/9.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a
+LOAD /usr/lib/gcc/arm-none-eabi/9.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libm.a
+START GROUP
+LOAD /usr/lib/gcc/arm-none-eabi/9.2.1/thumb/v7e-m+fp/hard/libgcc.a
+END GROUP
+START GROUP
+LOAD /usr/lib/gcc/arm-none-eabi/9.2.1/thumb/v7e-m+fp/hard/libgcc.a
+LOAD /usr/lib/gcc/arm-none-eabi/9.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a
+LOAD /usr/lib/gcc/arm-none-eabi/9.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libnosys.a
+END GROUP
+START GROUP
+LOAD /usr/lib/gcc/arm-none-eabi/9.2.1/thumb/v7e-m+fp/hard/libgcc.a
+LOAD /usr/lib/gcc/arm-none-eabi/9.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libc_nano.a
+LOAD /usr/lib/gcc/arm-none-eabi/9.2.1/../../../arm-none-eabi/lib/thumb/v7e-m+fp/hard/libnosys.a
+END GROUP
+OUTPUT(<WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/dummy_genericfx.elf elf32-littlearm)
+LOAD linker stubs
+
+.debug_info     0x0000000000000000     0x6c20
+ .debug_info    0x0000000000000000      0xf82 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+ .debug_info    0x0000000000000f82     0x1205 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+ .debug_info    0x0000000000002187     0x4a99 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+
+.debug_abbrev   0x0000000000000000      0xfab
+ .debug_abbrev  0x0000000000000000      0x249 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+ .debug_abbrev  0x0000000000000249      0x370 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+ .debug_abbrev  0x00000000000005b9      0x9f2 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+
+.debug_aranges  0x0000000000000000       0xf0
+ .debug_aranges
+                0x0000000000000000       0x18 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+ .debug_aranges
+                0x0000000000000018       0x20 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+ .debug_aranges
+                0x0000000000000038       0xb8 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+
+.debug_line     0x0000000000000000      0xc11
+ .debug_line    0x0000000000000000      0x117 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+ .debug_line    0x0000000000000117      0x1bf <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+ .debug_line    0x00000000000002d6      0x93b <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+
+.debug_str      0x0000000000000000     0x28da
+ .debug_str     0x0000000000000000      0xd07 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+                                        0xde9 (size before relaxing)
+ .debug_str     0x0000000000000d07      0x2d7 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+                                        0xd76 (size before relaxing)
+ .debug_str     0x0000000000000fde     0x18fc <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                                       0x241d (size before relaxing)
+
+.comment        0x0000000000000000       0x59
+ .comment       0x0000000000000000       0x59 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+                                         0x5a (size before relaxing)
+ .comment       0x0000000000000059       0x5a <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+ .comment       0x0000000000000059       0x5a <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+
+.ARM.attributes
+                0x0000000000000000       0x39
+ .ARM.attributes
+                0x0000000000000000       0x39 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+ .ARM.attributes
+                0x0000000000000039       0x34 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+ .ARM.attributes
+                0x000000000000006d       0x34 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+
+.debug_loc      0x0000000000000000      0x711
+ .debug_loc     0x0000000000000000       0x6f <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+ .debug_loc     0x000000000000006f      0x6a2 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+
+.debug_frame    0x0000000000000000      0x2f0
+ .debug_frame   0x0000000000000000       0xd0 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+ .debug_frame   0x00000000000000d0      0x220 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+
+.debug_ranges   0x0000000000000000      0x1a8
+ .debug_ranges  0x0000000000000000      0x1a8 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+
+Cross Reference Table
+
+Symbol                                            File
+Effect::getBufferSize() const                     <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+Effect::getParameterStrValue(unsigned char, long) const <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+Effect::getParameterStrValue(unsigned char, long) const::param4_strings <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+Effect::init(float*)                              <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+Effect::process(float const*, float*, unsigned long) <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+Effect::setParameter(unsigned char, long)         <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+Effect::teardown()                                <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+Effect::touchEvent(unsigned char, unsigned char, unsigned long, unsigned long) <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+Processor::aftertouch(unsigned char, unsigned char) <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+Processor::allNoteOff()                           <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+Processor::channelPressure(unsigned char)         <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+Processor::noteOff(unsigned char)                 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+Processor::noteOn(unsigned char, unsigned char)   <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+Processor::pitchBend(unsigned char)               <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+Processor::reset()                                <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+Processor::resume()                               <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+Processor::setTempo(float)                        <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+Processor::suspend()                              <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+Processor::tempo4ppqnTick(unsigned long)          <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+_DYNAMIC                                          <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+_GLOBAL_OFFSET_TABLE_                             <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+                                                  <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+unit_get_param_str_value                          <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                                                  <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+unit_get_param_value                              <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                                                  <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+unit_header                                       <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/header.o
+                                                  <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+unit_init                                         <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                                                  <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+unit_render                                       <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                                                  <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+unit_reset                                        <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                                                  <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+unit_resume                                       <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                                                  <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+unit_set_param_value                              <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                                                  <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+unit_set_tempo                                    <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                                                  <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+unit_suspend                                      <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                                                  <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+unit_teardown                                     <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                                                  <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+unit_tempo_4ppqn_tick                             <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                                                  <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+unit_touch_event                                  <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o
+                                                  <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/_unit_base.o
+vtable for Effect                                 <WORKSPACE>/external/logue-sdk/platform/nts-3_kaoss/dummy-genericfx//build/obj/unit.o

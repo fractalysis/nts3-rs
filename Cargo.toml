@@ -1,0 +1,17 @@
+[workspace]
+resolver = "2"
+members = ["fixtures/pass-through"]
+exclude = [
+    "example/smooth-echo-nih-plug",
+    "example/smooth-echo-nts3-plug",
+]
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+codegen-units = 1
+lto = "fat"
+opt-level = "z"
+panic = "abort"
+strip = "none"

@@ -1,0 +1,200 @@
+### ELF, ABI attributes, sections, segments, relocations, symbols, dynamic table
+ELF Header:
+  Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00 
+  Class:                             ELF32
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI Version:                       0
+  Type:                              DYN (Shared object file)
+  Machine:                           ARM
+  Version:                           0x1
+  Entry point address:               0x0
+  Start of program headers:          52 (bytes into file)
+  Start of section headers:          2488 (bytes into file)
+  Flags:                             0x5000400, Version5 EABI, hard-float ABI
+  Size of this header:               52 (bytes)
+  Size of program headers:           32 (bytes)
+  Number of program headers:         5
+  Size of section headers:           40 (bytes)
+  Number of section headers:         29
+  Section header string table index: 28
+
+Section Headers:
+  [Nr] Name              Type            Addr     Off    Size   ES Flg Lk Inf Al
+  [ 0]                   NULL            00000000 000000 000000 00      0   0  0
+  [ 1] .hash             HASH            000000d4 0000d4 0000bc 04   A  2   0  4
+  [ 2] .dynsym           DYNSYM          00000190 000190 0001c0 10   A  3   1  4
+  [ 3] .dynstr           STRTAB          00000350 000350 000158 00   A  0   0  4
+  [ 4] .rel.plt          REL             000004a8 0004a8 000000 08  AI  2  22  4
+  [ 5] .text             PROGBITS        000004a8 0004a8 0000a5 00  AX  0   0  4
+  [ 6] .unit_header      PROGBITS        00000550 000550 000178 00   A  0   0  8
+  [ 7] .ARM.exidx.text.unit_init ARM_EXIDX       000006c8 0006c8 000008 00  AL  5   0  4
+  [ 8] .ARM.exidx.text.unit_teardown ARM_EXIDX       000006d0 0006d0 000000 00  AL  5   0  4
+  [ 9] .ARM.exidx.text.unit_reset ARM_EXIDX       000006d0 0006d0 000000 00  AL  5   0  4
+  [10] .ARM.exidx.text.unit_resume ARM_EXIDX       000006d0 0006d0 000000 00  AL  5   0  4
+  [11] .ARM.exidx.text.unit_suspend ARM_EXIDX       000006d0 0006d0 000000 00  AL  5   0  4
+  [12] .ARM.exidx.text.unit_render ARM_EXIDX       000006d0 0006d0 000000 00  AL  5   0  4
+  [13] .ARM.exidx.text.unit_get_param_value ARM_EXIDX       000006d0 0006d0 000000 00  AL  5   0  4
+  [14] .ARM.exidx.text.unit_get_param_str_value ARM_EXIDX       000006d0 0006d0 000000 00  AL  5   0  4
+  [15] .ARM.exidx.text.unit_set_param_value ARM_EXIDX       000006d0 0006d0 000000 00  AL  5   0  4
+  [16] .ARM.exidx.text.unit_set_tempo ARM_EXIDX       000006d0 0006d0 000000 00  AL  5   0  4
+  [17] .ARM.exidx.text.unit_tempo_4ppqn_tick ARM_EXIDX       000006d0 0006d0 000000 00  AL  5   0  4
+  [18] .ARM.exidx.text.unit_touch_event ARM_EXIDX       000006d0 0006d0 000000 00  AL  5   0  4
+  [19] .preinit_array    PREINIT_ARRAY   000006d0 000734 000000 04  WA  0   0  4
+  [20] .init_array       INIT_ARRAY      000006d0 000734 000000 04  WA  0   0  4
+  [21] .dynamic          DYNAMIC         000006d0 0006d0 000058 08  WA  3   0  8
+  [22] .got              PROGBITS        00000728 000728 00000c 04  WA  0   0  4
+  [23] .data             PROGBITS        00000734 000734 000000 00  WA  0   0  4
+  [24] .bss              NOBITS          00000734 000734 000000 00  WA  0   0  4
+  [25] .stack            NOBITS          00000740 000734 000004 00  WA  0   0 16
+  [26] .comment          PROGBITS        00000000 000734 00002c 01  MS  0   0  1
+  [27] .ARM.attributes   ARM_ATTRIBUTES  00000000 000760 000043 00      0   0  1
+  [28] .shstrtab         STRTAB          00000000 0007a3 000212 00      0   0  1
+Key to Flags:
+  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
+  L (link order), O (extra OS processing required), G (group), T (TLS),
+  C (compressed), x (unknown), o (OS specific), E (exclude),
+  y (purecode), p (processor specific)
+
+Program Headers:
+  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
+  PHDR           0x000034 0x00000034 0x00000034 0x000a0 0x000a0 R   0x4
+  LOAD           0x000000 0x00000000 0x00000000 0x0054d 0x0054d R E 0x80
+  LOAD           0x000550 0x00000550 0x00000550 0x00180 0x00180 R   0x80
+  LOAD           0x0006d0 0x000006d0 0x000006d0 0x00064 0x00074 RW  0x80
+  DYNAMIC        0x0006d0 0x000006d0 0x000006d0 0x00058 0x00058 RW  0x8
+
+ Section to Segment mapping:
+  Segment Sections...
+   00     
+   01     .hash .dynsym .dynstr .rel.plt .text 
+   02     .unit_header .ARM.exidx.text.unit_init 
+   03     .ARM.exidx.text.unit_teardown .ARM.exidx.text.unit_reset .ARM.exidx.text.unit_resume .ARM.exidx.text.unit_suspend .ARM.exidx.text.unit_render .ARM.exidx.text.unit_get_param_value .ARM.exidx.text.unit_get_param_str_value .ARM.exidx.text.unit_set_param_value .ARM.exidx.text.unit_set_tempo .ARM.exidx.text.unit_tempo_4ppqn_tick .ARM.exidx.text.unit_touch_event .dynamic .got .bss .stack 
+   04     .dynamic 
+
+Dynamic section at offset 0x6d0 contains 6 entries:
+  Tag        Type                         Name/Value
+ 0x00000004 (HASH)                       0xd4
+ 0x00000005 (STRTAB)                     0x350
+ 0x00000006 (SYMTAB)                     0x190
+ 0x0000000a (STRSZ)                      344 (bytes)
+ 0x0000000b (SYMENT)                     16 (bytes)
+ 0x00000000 (NULL)                       0x0
+
+There are no relocations in this file.
+
+Symbol table '.dynsym' contains 28 entries:
+   Num:    Value  Size Type    Bind   Vis      Ndx Name
+     0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND 
+     1: 00000740     0 NOTYPE  GLOBAL DEFAULT   25 __HEAP
+     2: 000004a9    84 FUNC    GLOBAL DEFAULT    5 unit_init
+     3: 00000734     0 NOTYPE  GLOBAL DEFAULT   23 __data_start__
+     4: 00000501     2 FUNC    GLOBAL DEFAULT    5 unit_reset
+     5: 0000052d     4 FUNC    GLOBAL DEFAULT    5 unit_get_param_value
+     6: 00000740     0 NOTYPE  GLOBAL DEFAULT   25 _stack_addr
+     7: 00000000     0 NOTYPE  GLOBAL DEFAULT  ABS __stack_size
+     8: 00000734     0 NOTYPE  GLOBAL DEFAULT   24 __bss_start__
+     9: 00000549     2 FUNC    GLOBAL DEFAULT    5 unit_touch_event
+    10: 00000531    12 FUNC    GLOBAL DEFAULT    5 unit_get_param_str_value
+    11: 00000545     2 FUNC    GLOBAL DEFAULT    5 unit_tempo_4ppqn_tick
+    12: 0000053d     2 FUNC    GLOBAL DEFAULT    5 unit_set_param_value
+    13: 00000505     2 FUNC    GLOBAL DEFAULT    5 unit_resume
+    14: 00000000     0 NOTYPE  GLOBAL DEFAULT  ABS __heap_size
+    15: 00000740     0 NOTYPE  GLOBAL DEFAULT   25 end
+    16: 00000734     0 NOTYPE  GLOBAL DEFAULT   23 __data_end__
+    17: 00000734     0 NOTYPE  GLOBAL DEFAULT   24 __bss_end__
+    18: 00000740     0 NOTYPE  GLOBAL DEFAULT   25 __SP_INIT
+    19: 00000509     2 FUNC    GLOBAL DEFAULT    5 unit_suspend
+    20: 0000050d    30 FUNC    GLOBAL DEFAULT    5 unit_render
+    21: 00000740     0 NOTYPE  GLOBAL DEFAULT   25 _stack_end
+    22: 00000550   376 OBJECT  GLOBAL DEFAULT    6 unit_header
+    23: 000004fd     2 FUNC    GLOBAL DEFAULT    5 unit_teardown
+    24: 00000740     0 NOTYPE  GLOBAL DEFAULT   25 __stack
+    25: 00000541     2 FUNC    GLOBAL DEFAULT    5 unit_set_tempo
+    26: 00000740     0 NOTYPE  GLOBAL DEFAULT   25 _end
+    27: 00000740     0 NOTYPE  GLOBAL DEFAULT   25 __HEAP_END
+Attribute Section: aeabi
+File Attributes
+  Tag_conformance: "2.09"
+  Tag_CPU_name: "cortex-m7"
+  Tag_CPU_arch: v7E-M
+  Tag_CPU_arch_profile: Microcontroller
+  Tag_THUMB_ISA_use: Thumb-2
+  Tag_FP_arch: FPv5/FP-D16 for ARMv8
+  Tag_ABI_PCS_RW_data: PC-relative
+  Tag_ABI_PCS_RO_data: PC-relative
+  Tag_ABI_PCS_GOT_use: GOT-indirect
+  Tag_ABI_FP_denormal: Needed
+  Tag_ABI_FP_exceptions: Needed
+  Tag_ABI_FP_number_model: IEEE 754
+  Tag_ABI_align_needed: 8-byte
+  Tag_ABI_align_preserved: 8-byte, except leaf SP
+  Tag_ABI_VFP_args: VFP registers
+  Tag_ABI_optimization_goals: Aggressive Size
+  Tag_CPU_unaligned_access: v6
+  Tag_FP_HP_extension: Allowed
+  Tag_ABI_FP_16bit_format: IEEE 754
+
+### Dynamic symbols
+00000740 B __HEAP
+00000740 B __HEAP_END
+00000740 B __SP_INIT
+00000734 B __bss_end__
+00000734 B __bss_start__
+00000734 D __data_end__
+00000734 D __data_start__
+00000000 A __heap_size
+00000740 B __stack
+00000000 A __stack_size
+00000740 B _end
+00000740 B _stack_addr
+00000740 B _stack_end
+00000740 B end
+00000530 T unit_get_param_str_value
+0000052c T unit_get_param_value
+00000550 R unit_header
+000004a8 T unit_init
+0000050c T unit_render
+00000500 T unit_reset
+00000504 T unit_resume
+0000053c T unit_set_param_value
+00000540 T unit_set_tempo
+00000508 T unit_suspend
+000004fc T unit_teardown
+00000544 T unit_tempo_4ppqn_tick
+00000548 T unit_touch_event
+
+### Section sizes
+<WORKSPACE>/target/nts3/pass-through/pass_through.nts3unit  :
+section                                    size   addr
+.hash                                       188    212
+.dynsym                                     448    400
+.dynstr                                     344    848
+.rel.plt                                      0   1192
+.text                                       165   1192
+.unit_header                                376   1360
+.ARM.exidx.text.unit_init                     8   1736
+.ARM.exidx.text.unit_teardown                 0   1744
+.ARM.exidx.text.unit_reset                    0   1744
+.ARM.exidx.text.unit_resume                   0   1744
+.ARM.exidx.text.unit_suspend                  0   1744
+.ARM.exidx.text.unit_render                   0   1744
+.ARM.exidx.text.unit_get_param_value          0   1744
+.ARM.exidx.text.unit_get_param_str_value      0   1744
+.ARM.exidx.text.unit_set_param_value          0   1744
+.ARM.exidx.text.unit_set_tempo                0   1744
+.ARM.exidx.text.unit_tempo_4ppqn_tick         0   1744
+.ARM.exidx.text.unit_touch_event              0   1744
+.preinit_array                                0   1744
+.init_array                                   0   1744
+.dynamic                                     88   1744
+.got                                         12   1832
+.data                                         0   1844
+.bss                                          0   1844
+.stack                                        4   1856
+.comment                                     44      0
+.ARM.attributes                              67      0
+Total                                      1744
+
+

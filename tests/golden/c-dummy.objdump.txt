@@ -1,0 +1,402 @@
+
+<WORKSPACE>/target/nts3/pass-through/c-dummy/dummy_genericfx.nts3unit:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+000009b4 <unit_init-0x20>:
+ 9b4:	001ff06f 	andseq	pc, pc, pc, rrx
+ 9b8:	47704770 			; <UNDEFINED> instruction: 0x47704770
+ 9bc:	47704770 			; <UNDEFINED> instruction: 0x47704770
+ 9c0:	47704770 			; <UNDEFINED> instruction: 0x47704770
+ 9c4:	47702000 	ldrbmi	r2, [r0, -r0]!
+ 9c8:	47702000 	ldrbmi	r2, [r0, -r0]!
+ 9cc:	47704770 			; <UNDEFINED> instruction: 0x47704770
+ 9d0:	47704770 			; <UNDEFINED> instruction: 0x47704770
+
+000009d4 <unit_init>:
+ 9d4:	4b31      	ldr	r3, [pc, #196]	; (a9c <unit_init+0xc8>)
+ 9d6:	b510      	push	{r4, lr}
+ 9d8:	447b      	add	r3, pc
+ 9da:	2800      	cmp	r0, #0
+ 9dc:	d04c      	beq.n	a78 <unit_init+0xa4>
+ 9de:	4930      	ldr	r1, [pc, #192]	; (aa0 <unit_init+0xcc>)
+ 9e0:	6802      	ldr	r2, [r0, #0]
+ 9e2:	585c      	ldr	r4, [r3, r1]
+ 9e4:	6863      	ldr	r3, [r4, #4]
+ 9e6:	429a      	cmp	r2, r3
+ 9e8:	d149      	bne.n	a7e <unit_init+0xaa>
+ 9ea:	6843      	ldr	r3, [r0, #4]
+ 9ec:	f403 02fe 	and.w	r2, r3, #8323072	; 0x7f0000
+ 9f0:	f5b2 3f00 	cmp.w	r2, #131072	; 0x20000
+ 9f4:	d146      	bne.n	a84 <unit_init+0xb0>
+ 9f6:	f413 4ffe 	tst.w	r3, #32512	; 0x7f00
+ 9fa:	d143      	bne.n	a84 <unit_init+0xb0>
+ 9fc:	6883      	ldr	r3, [r0, #8]
+ 9fe:	ed9f 7a26 	vldr	s14, [pc, #152]	; a98 <unit_init+0xc4>
+ a02:	ee07 3a90 	vmov	s15, r3
+ a06:	eef8 7a67 	vcvt.f32.u32	s15, s15
+ a0a:	eef4 7a47 	vcmp.f32	s15, s14
+ a0e:	eef1 fa10 	vmrs	APSR_nzcv, fpscr
+ a12:	d13a      	bne.n	a8a <unit_init+0xb6>
+ a14:	7b83      	ldrb	r3, [r0, #14]
+ a16:	2b02      	cmp	r3, #2
+ a18:	d13a      	bne.n	a90 <unit_init+0xbc>
+ a1a:	7bc3      	ldrb	r3, [r0, #15]
+ a1c:	2b02      	cmp	r3, #2
+ a1e:	d137      	bne.n	a90 <unit_init+0xbc>
+ a20:	6943      	ldr	r3, [r0, #20]
+ a22:	b913      	cbnz	r3, a2a <unit_init+0x56>
+ a24:	f06f 000f 	mvn.w	r0, #15
+ a28:	bd10      	pop	{r4, pc}
+ a2a:	f44f 1080 	mov.w	r0, #1048576	; 0x100000
+ a2e:	4798      	blx	r3
+ a30:	2800      	cmp	r0, #0
+ a32:	d0f7      	beq.n	a24 <unit_init+0x50>
+ a34:	f500 1180 	add.w	r1, r0, #1048576	; 0x100000
+ a38:	4603      	mov	r3, r0
+ a3a:	2200      	movs	r2, #0
+ a3c:	4299      	cmp	r1, r3
+ a3e:	d002      	beq.n	a46 <unit_init+0x72>
+ a40:	f843 2b04 	str.w	r2, [r3], #4
+ a44:	e7fa      	b.n	a3c <unit_init+0x68>
+ a46:	4b17      	ldr	r3, [pc, #92]	; (aa4 <unit_init+0xd0>)
+ a48:	447b      	add	r3, pc
+ a4a:	609a      	str	r2, [r3, #8]
+ a4c:	3318      	adds	r3, #24
+ a4e:	f843 2c0c 	str.w	r2, [r3, #-12]
+ a52:	f843 2c08 	str.w	r2, [r3, #-8]
+ a56:	2201      	movs	r2, #1
+ a58:	f843 0c14 	str.w	r0, [r3, #-20]
+ a5c:	f843 2c04 	str.w	r2, [r3, #-4]
+ a60:	2200      	movs	r2, #0
+ a62:	eb04 1142 	add.w	r1, r4, r2, lsl #5
+ a66:	3201      	adds	r2, #1
+ a68:	f9b1 103e 	ldrsh.w	r1, [r1, #62]	; 0x3e
+ a6c:	2a08      	cmp	r2, #8
+ a6e:	f843 1b04 	str.w	r1, [r3], #4
+ a72:	d1f6      	bne.n	a62 <unit_init+0x8e>
+ a74:	2000      	movs	r0, #0
+ a76:	e7d7      	b.n	a28 <unit_init+0x54>
+ a78:	f06f 001f 	mvn.w	r0, #31
+ a7c:	e7d4      	b.n	a28 <unit_init+0x54>
+ a7e:	f04f 30ff 	mov.w	r0, #4294967295	; 0xffffffff
+ a82:	e7d1      	b.n	a28 <unit_init+0x54>
+ a84:	f06f 0001 	mvn.w	r0, #1
+ a88:	e7ce      	b.n	a28 <unit_init+0x54>
+ a8a:	f06f 0003 	mvn.w	r0, #3
+ a8e:	e7cb      	b.n	a28 <unit_init+0x54>
+ a90:	f06f 0007 	mvn.w	r0, #7
+ a94:	e7c8      	b.n	a28 <unit_init+0x54>
+ a96:	bf00      	nop
+ a98:	8000      	strh	r0, [r0, #0]
+ a9a:	473b      	bx	r7
+ a9c:	069c      	lsls	r4, r3, #26
+ a9e:	0000      	movs	r0, r0
+ aa0:	001c      	movs	r4, r3
+ aa2:	0000      	movs	r0, r0
+ aa4:	06ac      	lsls	r4, r5, #26
+	...
+
+00000aa8 <unit_teardown>:
+ aa8:	4b02      	ldr	r3, [pc, #8]	; (ab4 <unit_teardown+0xc>)
+ aaa:	2200      	movs	r2, #0
+ aac:	447b      	add	r3, pc
+ aae:	605a      	str	r2, [r3, #4]
+ ab0:	4770      	bx	lr
+ ab2:	bf00      	nop
+ ab4:	0648      	lsls	r0, r1, #25
+	...
+
+00000ab8 <unit_reset>:
+ ab8:	4770      	bx	lr
+
+00000aba <unit_resume>:
+ aba:	4770      	bx	lr
+
+00000abc <unit_suspend>:
+ abc:	4770      	bx	lr
+
+00000abe <unit_render>:
+ abe:	b508      	push	{r3, lr}
+ ac0:	4613      	mov	r3, r2
+ ac2:	460a      	mov	r2, r1
+ ac4:	4601      	mov	r1, r0
+ ac6:	4802      	ldr	r0, [pc, #8]	; (ad0 <unit_render+0x12>)
+ ac8:	4478      	add	r0, pc
+ aca:	f000 f8f9 	bl	cc0 <_ZN6Effect7processEPKfPfm@plt>
+ ace:	bd08      	pop	{r3, pc}
+ ad0:	062c      	lsls	r4, r5, #24
+	...
+
+00000ad4 <unit_set_param_value>:
+ ad4:	4b0d      	ldr	r3, [pc, #52]	; (b0c <unit_set_param_value+0x38>)
+ ad6:	4a0e      	ldr	r2, [pc, #56]	; (b10 <unit_set_param_value+0x3c>)
+ ad8:	447b      	add	r3, pc
+ ada:	b510      	push	{r4, lr}
+ adc:	589b      	ldr	r3, [r3, r2]
+ ade:	eb03 1340 	add.w	r3, r3, r0, lsl #5
+ ae2:	f933 4f38 	ldrsh.w	r4, [r3, #56]!
+ ae6:	f9b3 2002 	ldrsh.w	r2, [r3, #2]
+ aea:	428a      	cmp	r2, r1
+ aec:	dd03      	ble.n	af6 <unit_set_param_value+0x22>
+ aee:	428c      	cmp	r4, r1
+ af0:	4622      	mov	r2, r4
+ af2:	bfb8      	it	lt
+ af4:	460a      	movlt	r2, r1
+ af6:	4b07      	ldr	r3, [pc, #28]	; (b14 <unit_set_param_value+0x40>)
+ af8:	447b      	add	r3, pc
+ afa:	eb03 0180 	add.w	r1, r3, r0, lsl #2
+ afe:	618a      	str	r2, [r1, #24]
+ b00:	4601      	mov	r1, r0
+ b02:	4618      	mov	r0, r3
+ b04:	f000 f8e4 	bl	cd0 <_ZN6Effect12setParameterEhl@plt>
+ b08:	bd10      	pop	{r4, pc}
+ b0a:	bf00      	nop
+ b0c:	059c      	lsls	r4, r3, #22
+ b0e:	0000      	movs	r0, r0
+ b10:	001c      	movs	r4, r3
+ b12:	0000      	movs	r0, r0
+ b14:	05fc      	lsls	r4, r7, #23
+	...
+
+00000b18 <unit_get_param_value>:
+ b18:	4b02      	ldr	r3, [pc, #8]	; (b24 <unit_get_param_value+0xc>)
+ b1a:	447b      	add	r3, pc
+ b1c:	eb03 0080 	add.w	r0, r3, r0, lsl #2
+ b20:	6980      	ldr	r0, [r0, #24]
+ b22:	4770      	bx	lr
+ b24:	05da      	lsls	r2, r3, #23
+	...
+
+00000b28 <unit_get_param_str_value>:
+ b28:	4a0d      	ldr	r2, [pc, #52]	; (b60 <unit_get_param_str_value+0x38>)
+ b2a:	4b0e      	ldr	r3, [pc, #56]	; (b64 <unit_get_param_str_value+0x3c>)
+ b2c:	447a      	add	r2, pc
+ b2e:	b510      	push	{r4, lr}
+ b30:	58d3      	ldr	r3, [r2, r3]
+ b32:	eb03 1340 	add.w	r3, r3, r0, lsl #5
+ b36:	f933 4f38 	ldrsh.w	r4, [r3, #56]!
+ b3a:	f9b3 3002 	ldrsh.w	r3, [r3, #2]
+ b3e:	428b      	cmp	r3, r1
+ b40:	dd03      	ble.n	b4a <unit_get_param_str_value+0x22>
+ b42:	428c      	cmp	r4, r1
+ b44:	4623      	mov	r3, r4
+ b46:	bfb8      	it	lt
+ b48:	460b      	movlt	r3, r1
+ b4a:	2803      	cmp	r0, #3
+ b4c:	d106      	bne.n	b5c <unit_get_param_str_value+0x34>
+ b4e:	2b03      	cmp	r3, #3
+ b50:	d804      	bhi.n	b5c <unit_get_param_str_value+0x34>
+ b52:	4905      	ldr	r1, [pc, #20]	; (b68 <unit_get_param_str_value+0x40>)
+ b54:	5852      	ldr	r2, [r2, r1]
+ b56:	f852 0023 	ldr.w	r0, [r2, r3, lsl #2]
+ b5a:	bd10      	pop	{r4, pc}
+ b5c:	2000      	movs	r0, #0
+ b5e:	e7fc      	b.n	b5a <unit_get_param_str_value+0x32>
+ b60:	0548      	lsls	r0, r1, #21
+ b62:	0000      	movs	r0, r0
+ b64:	001c      	movs	r4, r3
+ b66:	0000      	movs	r0, r0
+ b68:	0018      	movs	r0, r3
+	...
+
+00000b6c <unit_touch_event>:
+ b6c:	4770      	bx	lr
+
+00000b6e <unit_set_tempo>:
+ b6e:	4770      	bx	lr
+
+00000b70 <unit_tempo_4ppqn_tick>:
+ b70:	4770      	bx	lr
+ b72:	bf00      	nop
+
+00000b74 <_ZN9Processor5resetEv>:
+ b74:	4770      	bx	lr
+	...
+
+00000b78 <_ZN9Processor6resumeEv>:
+ b78:	4770      	bx	lr
+	...
+
+00000b7c <_ZN9Processor7suspendEv>:
+ b7c:	4770      	bx	lr
+	...
+
+00000b80 <_ZN9Processor6noteOnEhh>:
+ b80:	4770      	bx	lr
+	...
+
+00000b84 <_ZN9Processor7noteOffEh>:
+ b84:	4770      	bx	lr
+	...
+
+00000b88 <_ZN9Processor10allNoteOffEv>:
+ b88:	4770      	bx	lr
+	...
+
+00000b8c <_ZN9Processor9pitchBendEh>:
+ b8c:	4770      	bx	lr
+	...
+
+00000b90 <_ZN9Processor15channelPressureEh>:
+ b90:	4770      	bx	lr
+	...
+
+00000b94 <_ZN9Processor10aftertouchEhh>:
+ b94:	4770      	bx	lr
+	...
+
+00000b98 <_ZN9Processor8setTempoEf>:
+ b98:	4770      	bx	lr
+	...
+
+00000b9c <_ZN9Processor14tempo4ppqnTickEm>:
+ b9c:	4770      	bx	lr
+	...
+
+00000ba0 <_ZNK6Effect13getBufferSizeEv>:
+ ba0:	f44f 2080 	mov.w	r0, #262144	; 0x40000
+ ba4:	4770      	bx	lr
+	...
+
+00000ba8 <_ZN6Effect12setParameterEhl>:
+ ba8:	2903      	cmp	r1, #3
+ baa:	d827      	bhi.n	bfc <_ZN6Effect12setParameterEhl+0x54>
+ bac:	e8df f001 	tbb	[pc, r1]
+ bb0:	0e02      	lsrs	r2, r0, #24
+ bb2:	251a      	movs	r5, #26
+ bb4:	b293      	uxth	r3, r2
+ bb6:	ed9f 7a12 	vldr	s14, [pc, #72]	; c00 <_ZN6Effect12setParameterEhl+0x58>
+ bba:	ee07 3a90 	vmov	s15, r3
+ bbe:	eef8 7ae7 	vcvt.f32.s32	s15, s15
+ bc2:	ee67 7a87 	vmul.f32	s15, s15, s14
+ bc6:	edc0 7a02 	vstr	s15, [r0, #8]
+ bca:	4770      	bx	lr
+ bcc:	b293      	uxth	r3, r2
+ bce:	ed9f 7a0c 	vldr	s14, [pc, #48]	; c00 <_ZN6Effect12setParameterEhl+0x58>
+ bd2:	ee07 3a90 	vmov	s15, r3
+ bd6:	eef8 7ae7 	vcvt.f32.s32	s15, s15
+ bda:	ee67 7a87 	vmul.f32	s15, s15, s14
+ bde:	edc0 7a03 	vstr	s15, [r0, #12]
+ be2:	4770      	bx	lr
+ be4:	ee07 2a90 	vmov	s15, r2
+ be8:	eddf 6a06 	vldr	s13, [pc, #24]	; c04 <_ZN6Effect12setParameterEhl+0x5c>
+ bec:	eef8 7ae7 	vcvt.f32.s32	s15, s15
+ bf0:	ee87 7aa6 	vdiv.f32	s14, s15, s13
+ bf4:	ed80 7a04 	vstr	s14, [r0, #16]
+ bf8:	4770      	bx	lr
+ bfa:	6142      	str	r2, [r0, #20]
+ bfc:	4770      	bx	lr
+ bfe:	bf00      	nop
+ c00:	2008      	movs	r0, #8
+ c02:	3a80      	subs	r2, #128	; 0x80
+ c04:	0000      	movs	r0, r0
+ c06:	447a      	add	r2, pc
+
+00000c08 <_ZNK6Effect20getParameterStrValueEhl>:
+ c08:	4b06      	ldr	r3, [pc, #24]	; (c24 <_ZNK6Effect20getParameterStrValueEhl+0x1c>)
+ c0a:	2903      	cmp	r1, #3
+ c0c:	447b      	add	r3, pc
+ c0e:	d106      	bne.n	c1e <_ZNK6Effect20getParameterStrValueEhl+0x16>
+ c10:	2a03      	cmp	r2, #3
+ c12:	d804      	bhi.n	c1e <_ZNK6Effect20getParameterStrValueEhl+0x16>
+ c14:	4904      	ldr	r1, [pc, #16]	; (c28 <_ZNK6Effect20getParameterStrValueEhl+0x20>)
+ c16:	585b      	ldr	r3, [r3, r1]
+ c18:	f853 0022 	ldr.w	r0, [r3, r2, lsl #2]
+ c1c:	4770      	bx	lr
+ c1e:	2000      	movs	r0, #0
+ c20:	4770      	bx	lr
+ c22:	bf00      	nop
+ c24:	0468      	lsls	r0, r5, #17
+ c26:	0000      	movs	r0, r0
+ c28:	0018      	movs	r0, r3
+	...
+
+00000c2c <_ZN6Effect4initEPf>:
+ c2c:	2300      	movs	r3, #0
+ c2e:	6041      	str	r1, [r0, #4]
+ c30:	6083      	str	r3, [r0, #8]
+ c32:	60c3      	str	r3, [r0, #12]
+ c34:	6103      	str	r3, [r0, #16]
+ c36:	2301      	movs	r3, #1
+ c38:	6143      	str	r3, [r0, #20]
+ c3a:	4770      	bx	lr
+
+00000c3c <_ZN6Effect8teardownEv>:
+ c3c:	2300      	movs	r3, #0
+ c3e:	6043      	str	r3, [r0, #4]
+ c40:	4770      	bx	lr
+	...
+
+00000c44 <_ZN6Effect7processEPKfPfm>:
+ c44:	eb02 03c3 	add.w	r3, r2, r3, lsl #3
+ c48:	429a      	cmp	r2, r3
+ c4a:	f101 0108 	add.w	r1, r1, #8
+ c4e:	d009      	beq.n	c64 <_ZN6Effect7processEPKfPfm+0x20>
+ c50:	f851 0c08 	ldr.w	r0, [r1, #-8]
+ c54:	3208      	adds	r2, #8
+ c56:	f842 0c08 	str.w	r0, [r2, #-8]
+ c5a:	f851 0c04 	ldr.w	r0, [r1, #-4]
+ c5e:	f842 0c04 	str.w	r0, [r2, #-4]
+ c62:	e7f1      	b.n	c48 <_ZN6Effect7processEPKfPfm+0x4>
+ c64:	4770      	bx	lr
+	...
+
+00000c68 <_ZN6Effect10touchEventEhhmm>:
+ c68:	4770      	bx	lr
+ c6a:	0000      	movs	r0, r0
+ c6c:	4a07      	ldr	r2, [pc, #28]	; (c8c <_ZN6Effect10touchEventEhhmm+0x24>)
+ c6e:	4908      	ldr	r1, [pc, #32]	; (c90 <_ZN6Effect10touchEventEhhmm+0x28>)
+ c70:	447a      	add	r2, pc
+ c72:	4b08      	ldr	r3, [pc, #32]	; (c94 <_ZN6Effect10touchEventEhhmm+0x2c>)
+ c74:	5852      	ldr	r2, [r2, r1]
+ c76:	447b      	add	r3, pc
+ c78:	3208      	adds	r2, #8
+ c7a:	601a      	str	r2, [r3, #0]
+ c7c:	2200      	movs	r2, #0
+ c7e:	609a      	str	r2, [r3, #8]
+ c80:	60da      	str	r2, [r3, #12]
+ c82:	611a      	str	r2, [r3, #16]
+ c84:	2201      	movs	r2, #1
+ c86:	615a      	str	r2, [r3, #20]
+ c88:	4770      	bx	lr
+ c8a:	bf00      	nop
+ c8c:	0404      	lsls	r4, r0, #16
+ c8e:	0000      	movs	r0, r0
+ c90:	0014      	movs	r4, r2
+ c92:	0000      	movs	r0, r0
+ c94:	047e      	lsls	r6, r7, #17
+ c96:	0000      	movs	r0, r0
+ c98:	4156      	adcs	r6, r2
+ c9a:	204c      	movs	r0, #76	; 0x4c
+ c9c:	0030      	movs	r0, r6
+ c9e:	4156      	adcs	r6, r2
+ ca0:	204c      	movs	r0, #76	; 0x4c
+ ca2:	0031      	movs	r1, r6
+ ca4:	4156      	adcs	r6, r2
+ ca6:	204c      	movs	r0, #76	; 0x4c
+ ca8:	0032      	movs	r2, r6
+ caa:	4156      	adcs	r6, r2
+ cac:	204c      	movs	r0, #76	; 0x4c
+ cae:	0033      	movs	r3, r6
+
+Disassembly of section .plt:
+
+00000cb0 <_ZN6Effect7processEPKfPfm@plt-0x10>:
+ cb0:	f8dfb500 			; <UNDEFINED> instruction: 0xf8dfb500
+ cb4:	44fee008 	ldrbtmi	lr, [lr], #8
+ cb8:	ff08f85e 			; <UNDEFINED> instruction: 0xff08f85e
+ cbc:	000003bc 			; <UNDEFINED> instruction: 0x000003bc
+
+00000cc0 <_ZN6Effect7processEPKfPfm@plt>:
+ cc0:	3cb8f240 	lfmcc	f7, 1, [r8], #256	; 0x100
+ cc4:	0c00f2c0 	sfmeq	f7, 1, [r0], {192}	; 0xc0
+ cc8:	f8dc44fc 			; <UNDEFINED> instruction: 0xf8dc44fc
+ ccc:	e7fdf000 	ldrb	pc, [sp, r0]!	; <UNPREDICTABLE>
+
+00000cd0 <_ZN6Effect12setParameterEhl@plt>:
+ cd0:	3cacf240 	sfmcc	f7, 1, [ip], #256	; 0x100
+ cd4:	0c00f2c0 	sfmeq	f7, 1, [r0], {192}	; 0xc0
+ cd8:	f8dc44fc 			; <UNDEFINED> instruction: 0xf8dc44fc
+ cdc:	e7fdf000 	ldrb	pc, [sp, r0]!	; <UNPREDICTABLE>

@@ -1,0 +1,106 @@
+
+<WORKSPACE>/target/nts3/pass-through/pass_through.nts3unit:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+000004a8 <unit_init>:
+ 4a8:	b1e0      	cbz	r0, 4e4 <unit_init+0x3c>
+ 4aa:	6801      	ldr	r1, [r0, #0]
+ 4ac:	f240 6207 	movw	r2, #1543	; 0x607
+ 4b0:	4291      	cmp	r1, r2
+ 4b2:	d119      	bne.n	4e8 <unit_init+0x40>
+ 4b4:	6841      	ldr	r1, [r0, #4]
+ 4b6:	4a10      	ldr	r2, [pc, #64]	; (4f8 <unit_init+0x50>)
+ 4b8:	4011      	ands	r1, r2
+ 4ba:	f5b1 3f00 	cmp.w	r1, #131072	; 0x20000
+ 4be:	d115      	bne.n	4ec <unit_init+0x44>
+ 4c0:	6881      	ldr	r1, [r0, #8]
+ 4c2:	f64b 3280 	movw	r2, #48000	; 0xbb80
+ 4c6:	4291      	cmp	r1, r2
+ 4c8:	d112      	bne.n	4f0 <unit_init+0x48>
+ 4ca:	7bc1      	ldrb	r1, [r0, #15]
+ 4cc:	7b80      	ldrb	r0, [r0, #14]
+ 4ce:	f080 0002 	eor.w	r0, r0, #2
+ 4d2:	f081 0102 	eor.w	r1, r1, #2
+ 4d6:	4308      	orrs	r0, r1
+ 4d8:	b2c0      	uxtb	r0, r0
+ 4da:	2800      	cmp	r0, #0
+ 4dc:	bf18      	it	ne
+ 4de:	f06f 0007 	mvnne.w	r0, #7
+ 4e2:	e006      	b.n	4f2 <unit_init+0x4a>
+ 4e4:	20e0      	movs	r0, #224	; 0xe0
+ 4e6:	e004      	b.n	4f2 <unit_init+0x4a>
+ 4e8:	20ff      	movs	r0, #255	; 0xff
+ 4ea:	e002      	b.n	4f2 <unit_init+0x4a>
+ 4ec:	20fe      	movs	r0, #254	; 0xfe
+ 4ee:	e000      	b.n	4f2 <unit_init+0x4a>
+ 4f0:	20fc      	movs	r0, #252	; 0xfc
+ 4f2:	b240      	sxtb	r0, r0
+ 4f4:	4770      	bx	lr
+ 4f6:	bf00      	nop
+ 4f8:	7f00      	ldrb	r0, [r0, #28]
+ 4fa:	007f      	lsls	r7, r7, #1
+
+000004fc <unit_teardown>:
+ 4fc:	4770      	bx	lr
+	...
+
+00000500 <unit_reset>:
+ 500:	4770      	bx	lr
+	...
+
+00000504 <unit_resume>:
+ 504:	4770      	bx	lr
+	...
+
+00000508 <unit_suspend>:
+ 508:	4770      	bx	lr
+	...
+
+0000050c <unit_render>:
+ 50c:	2a00      	cmp	r2, #0
+ 50e:	d403      	bmi.n	518 <unit_render+0xc>
+ 510:	0052      	lsls	r2, r2, #1
+ 512:	bf18      	it	ne
+ 514:	2800      	cmpne	r0, #0
+ 516:	d100      	bne.n	51a <unit_render+0xe>
+ 518:	4770      	bx	lr
+ 51a:	b919      	cbnz	r1, 524 <unit_render+0x18>
+ 51c:	e7fc      	b.n	518 <unit_render+0xc>
+ 51e:	c808      	ldmia	r0!, {r3}
+ 520:	3a01      	subs	r2, #1
+ 522:	c108      	stmia	r1!, {r3}
+ 524:	2a00      	cmp	r2, #0
+ 526:	d1fa      	bne.n	51e <unit_render+0x12>
+ 528:	e7f6      	b.n	518 <unit_render+0xc>
+	...
+
+0000052c <unit_get_param_value>:
+ 52c:	2000      	movs	r0, #0
+ 52e:	4770      	bx	lr
+
+00000530 <unit_get_param_str_value>:
+ 530:	4801      	ldr	r0, [pc, #4]	; (538 <unit_get_param_str_value+0x8>)
+ 532:	4478      	add	r0, pc
+ 534:	4770      	bx	lr
+ 536:	bf00      	nop
+ 538:	0016      	movs	r6, r2
+	...
+
+0000053c <unit_set_param_value>:
+ 53c:	4770      	bx	lr
+	...
+
+00000540 <unit_set_tempo>:
+ 540:	4770      	bx	lr
+	...
+
+00000544 <unit_tempo_4ppqn_tick>:
+ 544:	4770      	bx	lr
+	...
+
+00000548 <unit_touch_event>:
+ 548:	4770      	bx	lr
+ 54a:	0000      	movs	r0, r0
+	...
