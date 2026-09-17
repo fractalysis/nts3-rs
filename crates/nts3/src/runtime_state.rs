@@ -177,12 +177,9 @@ mod tests {
     use super::*;
     use core::alloc::{GlobalAlloc, Layout};
     use core::ptr;
-    use std::sync::Mutex;
     use std::sync::atomic::{AtomicUsize, Ordering};
 
-    use crate::allocator::FrameworkAllocator;
-
-    static SERIAL: Mutex<()> = Mutex::new(());
+    use crate::allocator::{FrameworkAllocator, TEST_SERIAL};
     static ALLOC_CALLS: AtomicUsize = AtomicUsize::new(0);
     static FREE_CALLS: AtomicUsize = AtomicUsize::new(0);
     static DROPS: AtomicUsize = AtomicUsize::new(0);
@@ -270,7 +267,9 @@ mod tests {
 
     #[test]
     fn successful_repeated_lifecycles_use_one_alloc_free_pair() {
-        let _guard = SERIAL.lock().unwrap_or_else(|error| error.into_inner());
+        let _guard = TEST_SERIAL
+            .lock()
+            .unwrap_or_else(|error| error.into_inner());
         reset_counters();
         let mut runtime = RuntimeState::<AllocatingValue>::new();
 
@@ -297,7 +296,9 @@ mod tests {
 
     #[test]
     fn allocation_failure_never_constructs_value() {
-        let _guard = SERIAL.lock().unwrap_or_else(|error| error.into_inner());
+        let _guard = TEST_SERIAL
+            .lock()
+            .unwrap_or_else(|error| error.into_inner());
         reset_counters();
         let mut runtime = RuntimeState::<AllocatingValue>::new();
         let mut constructed = false;
@@ -314,7 +315,9 @@ mod tests {
 
     #[test]
     fn null_arena_allocation_fails_without_construction_or_free() {
-        let _guard = SERIAL.lock().unwrap_or_else(|error| error.into_inner());
+        let _guard = TEST_SERIAL
+            .lock()
+            .unwrap_or_else(|error| error.into_inner());
         reset_counters();
         let null_hooks = UnitRuntimeHooks::new(
             ptr::null(),
@@ -337,7 +340,9 @@ mod tests {
 
     #[test]
     fn construction_failure_releases_arena_and_allows_reinit() {
-        let _guard = SERIAL.lock().unwrap_or_else(|error| error.into_inner());
+        let _guard = TEST_SERIAL
+            .lock()
+            .unwrap_or_else(|error| error.into_inner());
         reset_counters();
         let mut runtime = RuntimeState::<AllocatingValue>::new();
         assert_eq!(
@@ -358,7 +363,9 @@ mod tests {
 
     #[test]
     fn invalid_transitions_do_not_touch_uninitialized_storage() {
-        let _guard = SERIAL.lock().unwrap_or_else(|error| error.into_inner());
+        let _guard = TEST_SERIAL
+            .lock()
+            .unwrap_or_else(|error| error.into_inner());
         let mut runtime = RuntimeState::<u32>::new();
         assert_eq!(runtime.suspend(), Err(RuntimeInitError::InvalidState));
         assert_eq!(runtime.resume(), Err(RuntimeInitError::InvalidState));

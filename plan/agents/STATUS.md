@@ -9,7 +9,7 @@ handoff when finished or blocked.
 | 01 Toolchain and ELF spike | DONE | [handoff](handoffs/01-toolchain-elf-spike.md) |
 | 02 Raw ABI | DONE | [handoff](handoffs/02-raw-abi.md) |
 | 03 SDRAM allocator | DONE | [handoff](handoffs/03-sdram-allocator.md) |
-| 04 Runtime adapters | NOT_STARTED | — |
+| 04 Runtime adapters | DONE | [handoff](handoffs/04-runtime-adapters.md) |
 | 05 Parameter core | NOT_STARTED | — |
 | 06 Parameter derive | NOT_STARTED | — |
 | 07 Plugin export | NOT_STARTED | — |

@@ -19,3 +19,10 @@ version = "0.1.0"
 dependencies = [
  "nts3-sys",
 ]
+
+[[package]]
+name = "touch-probe"
+version = "0.1.0"
+dependencies = [
+ "nts3",
+]

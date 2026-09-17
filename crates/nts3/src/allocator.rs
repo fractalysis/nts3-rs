@@ -246,6 +246,9 @@ unsafe impl Sync for GlobalState {}
 
 static STATE: GlobalState = GlobalState(UnsafeCell::new(AllocatorState::new()));
 
+#[cfg(test)]
+pub(crate) static TEST_SERIAL: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
 fn with_state<R>(f: impl FnOnce(&mut AllocatorState) -> R) -> R {
     // SAFETY: access is serialized by the runtime lifecycle contract described
     // on `GlobalState`; no reference to the state escapes this call.
