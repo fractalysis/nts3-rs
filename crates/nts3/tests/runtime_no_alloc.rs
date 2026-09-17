@@ -118,6 +118,9 @@ fn every_post_init_runtime_path_allocates_zero_bytes() {
         }
     });
     assert_eq!(output, input);
+    assert_eq!(assert_no_alloc(|| controller.get_parameter(255)), 0);
+    assert!(!assert_no_alloc(|| controller.set_parameter(255, i32::MAX)));
+    assert!(assert_no_alloc(|| controller.parameter_string_value(255, 0)).is_null());
     assert!(assert_no_alloc(|| controller.reset()));
     assert!(assert_no_alloc(|| controller.touch_event(
         0,

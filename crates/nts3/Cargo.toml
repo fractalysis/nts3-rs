@@ -7,6 +7,7 @@ description = "Safe no_std framework core for Korg NTS-3 generic effects"
 publish = false
 
 [dependencies]
+libm = "0.2.15"
 nts3-sys = { path = "../nts3-sys" }
 
 [[example]]

@@ -9,12 +9,18 @@ Target-safe framework core for Korg NTS-3 `genericfx` units.
 - `StereoBuffer`, whose iterator supports separate and exact in-place stereo
   buffers without exposing aliased references;
 - typed `TouchPhase`/`TouchEvent` values with raw, clamped, and normalized
-  positions independent of active state.
+  positions independent of active state;
+- compact integer-backed `Parameter` and per-sample `SmoothedParameter` values.
 
 The runtime validates the SDK descriptor before state construction, owns plugin
 and parameter state, refreshes optional raw input for each render, bounds frame
-counts, and dispatches all lifecycle hooks. The parameter contract is a sealed
-temporary placeholder until the parameter engine and derive are added.
+counts, and dispatches all lifecycle and parameter callbacks. Generated code
+implements the sealed `Nts3Parameters` metadata/dispatch contract.
+
+Smoothing is a `no_std` adaptation of wrl/baseplug's MIT-licensed one-pole
+algorithm. `smoothing_ms` is an exponential time constant (about 36.8% error
+remains after one interval), not a linear completion duration. See the source
+attribution and modification notice in `../../THIRD_PARTY_NOTICES.md`.
 
 The allocator reserves exactly one Korg SDRAM block and suballocates it with
 checked 32-bit aligned bump arithmetic while a plugin is being constructed. The

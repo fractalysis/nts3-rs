@@ -8,6 +8,7 @@ extern crate std;
 #[allow(dead_code)]
 mod allocator;
 mod buffer;
+mod parameter;
 mod plugin;
 #[doc(hidden)]
 pub mod runtime;
@@ -17,14 +18,11 @@ mod touch;
 
 pub use allocator::AllocationStats;
 pub use buffer::{BufferError, StereoBuffer, StereoFrame, StereoFramesMut, StereoInput};
+pub use parameter::{
+    Nts3Parameters, Parameter, ParameterError, Smooth, SmoothStatus, SmoothedParameter,
+};
 pub use plugin::{InitContext, InitError, Nts3Plugin};
 pub use touch::{TouchEvent, TouchPhase};
-
-/// Temporary sealed parameter contract. Task 05 expands this with descriptor,
-/// dispatch, and smoothing hooks; plugin authors receive implementations from
-/// the derive macro rather than implementing it manually.
-#[doc(hidden)]
-pub trait Nts3Parameters: __private::Sealed + Default {}
 
 /// Implementation details used by generated code and internal fixtures.
 #[doc(hidden)]
@@ -35,8 +33,8 @@ pub mod __private {
 /// Common plugin-author imports.
 pub mod prelude {
     pub use crate::{
-        InitContext, InitError, Nts3Parameters, Nts3Plugin, StereoBuffer, StereoInput, TouchEvent,
-        TouchPhase,
+        InitContext, InitError, Nts3Parameters, Nts3Plugin, Parameter, ParameterError, Smooth,
+        SmoothStatus, SmoothedParameter, StereoBuffer, StereoInput, TouchEvent, TouchPhase,
     };
 }
 

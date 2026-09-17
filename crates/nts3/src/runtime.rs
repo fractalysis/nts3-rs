@@ -1,3 +1,4 @@
+use core::ffi::c_char;
 use core::marker::PhantomData;
 use core::ptr;
 
@@ -10,6 +11,7 @@ use nts3_sys::{
 
 use crate::allocator::AllocationStats;
 use crate::buffer::{BufferError, StereoBuffer};
+use crate::parameter::Nts3Parameters;
 use crate::plugin::{InitContext, InitError, Nts3Plugin};
 use crate::runtime_state::{RuntimeInitError, RuntimeState};
 use crate::touch::{TouchEvent, TouchPhase};
@@ -47,7 +49,9 @@ impl<P: Nts3Plugin> Runtime<P> {
     fn construct(context: RuntimeContext) -> Result<Self, InitError> {
         // Keep this order stable: generated parameter defaults precede plugin
         // construction, matching the framework initialization contract.
-        let parameters = P::Parameters::default();
+        let mut parameters = P::Parameters::default();
+        parameters.initialize_smoothers(context.sample_rate_hz as f32);
+        parameters.reset_smoothers();
         let plugin = P::default();
         let mut runtime = Self {
             plugin,
@@ -60,6 +64,8 @@ impl<P: Nts3Plugin> Runtime<P> {
     }
 
     fn reset(&mut self) {
+        // SDK reset retains parameter targets but discards an in-flight ramp.
+        self.parameters.reset_smoothers();
         self.plugin.reset();
     }
 
@@ -101,7 +107,9 @@ impl<P: Nts3Plugin> Runtime<P> {
         // buffer cannot escape `process`, and validates shape/overlap before use.
         let mut buffer = unsafe { StereoBuffer::from_raw(input, output, raw_input, frames) }
             .map_err(RenderError::Buffer)?;
+        self.parameters.begin_block();
         self.plugin.process(&mut self.parameters, &mut buffer);
+        self.parameters.end_block();
         Ok(())
     }
 
@@ -224,6 +232,30 @@ impl<P: Nts3Plugin> RuntimeController<P> {
         unsafe { runtime.render(input, output, frames) }
     }
 
+    /// Returns a parameter's raw target, or zero for inactive/unknown IDs.
+    pub fn get_parameter(&mut self, index: u8) -> i32 {
+        self.state
+            .active_mut()
+            .and_then(|runtime| runtime.parameters.get(index))
+            .unwrap_or(0)
+    }
+
+    /// Clamps and dispatches a parameter update. Unknown IDs are ignored.
+    pub fn set_parameter(&mut self, index: u8, value: i32) -> bool {
+        let Some(runtime) = self.state.active_mut() else {
+            return false;
+        };
+        runtime.parameters.set(index, value)
+    }
+
+    /// Returns a static custom display string, or null for inactive/unknown IDs.
+    pub fn parameter_string_value(&mut self, index: u8, value: i32) -> *const c_char {
+        self.state
+            .active_mut()
+            .and_then(|runtime| runtime.parameters.string_value(index, value))
+            .map_or(ptr::null(), |value| value.as_ptr())
+    }
+
     pub fn touch_event(&mut self, id: u8, raw_phase: u8, x: u32, y: u32) -> bool {
         let Some(phase) = TouchPhase::from_raw(raw_phase) else {
             return false;
@@ -341,13 +373,16 @@ mod tests {
     use super::*;
     use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
     use nts3_sys::{
-        UNIT_API_2_0_0, UNIT_TOUCH_PHASE_BEGAN, UNIT_TOUCH_PHASE_CANCELLED, UNIT_TOUCH_PHASE_ENDED,
-        UNIT_TOUCH_PHASE_MOVED, UNIT_TOUCH_PHASE_STATIONARY,
+        GENERICFX_PARAM_ASSIGN_X, GENERICFX_PARAM_ASSIGN_Y, GenericfxCurve, GenericfxParamMapping,
+        UNIT_API_2_0_0, UNIT_MAX_PARAM_COUNT, UNIT_PARAM_NAME_SIZE, UNIT_PARAM_TYPE_MSEC,
+        UNIT_PARAM_TYPE_PERCENT, UNIT_TOUCH_PHASE_BEGAN, UNIT_TOUCH_PHASE_CANCELLED,
+        UNIT_TOUCH_PHASE_ENDED, UNIT_TOUCH_PHASE_MOVED, UNIT_TOUCH_PHASE_STATIONARY,
+        UNUSED_MAPPING, UNUSED_PARAM, UnitParam, UnitParamFormat,
     };
 
     use crate::__private::Sealed;
     use crate::allocator::TEST_SERIAL;
-    use crate::{Nts3Parameters, StereoBuffer};
+    use crate::{Nts3Parameters, Parameter, SmoothStatus, SmoothedParameter, StereoBuffer};
     static ALLOCATIONS: AtomicUsize = AtomicUsize::new(0);
     static FREES: AtomicUsize = AtomicUsize::new(0);
     static RAW_CALLS: AtomicUsize = AtomicUsize::new(0);
@@ -481,6 +516,145 @@ mod tests {
     struct FailingParameters;
     impl Sealed for FailingParameters {}
     impl Nts3Parameters for FailingParameters {}
+
+    const fn parameter_name(value: &[u8]) -> [u8; UNIT_PARAM_NAME_SIZE] {
+        let mut result = [0; UNIT_PARAM_NAME_SIZE];
+        let mut index = 0;
+        while index < value.len() && index < UNIT_PARAM_NAME_SIZE - 1 {
+            result[index] = value[index];
+            index += 1;
+        }
+        result
+    }
+
+    const MANUAL_DESCRIPTORS: [UnitParam; UNIT_MAX_PARAM_COUNT] = [
+        UnitParam::new(
+            1,
+            2_000,
+            1,
+            500,
+            UNIT_PARAM_TYPE_MSEC,
+            UnitParamFormat::FIXED_ZERO,
+            parameter_name(b"TIME"),
+        ),
+        UnitParam::new(
+            0,
+            1_000,
+            0,
+            0,
+            UNIT_PARAM_TYPE_PERCENT,
+            UnitParamFormat::from_raw(0x11),
+            parameter_name(b"FEEDBACK"),
+        ),
+        UNUSED_PARAM,
+        UNUSED_PARAM,
+        UNUSED_PARAM,
+        UNUSED_PARAM,
+        UNUSED_PARAM,
+        UNUSED_PARAM,
+    ];
+    const MANUAL_MAPPINGS: [GenericfxParamMapping; UNIT_MAX_PARAM_COUNT] = [
+        GenericfxParamMapping::new(
+            GENERICFX_PARAM_ASSIGN_X,
+            GenericfxCurve::from_raw(1),
+            1,
+            2_000,
+            500,
+        ),
+        GenericfxParamMapping::new(
+            GENERICFX_PARAM_ASSIGN_Y,
+            GenericfxCurve::LINEAR_UNIPOLAR,
+            0,
+            1_000,
+            0,
+        ),
+        UNUSED_MAPPING,
+        UNUSED_MAPPING,
+        UNUSED_MAPPING,
+        UNUSED_MAPPING,
+        UNUSED_MAPPING,
+        UNUSED_MAPPING,
+    ];
+
+    struct ManualParameters {
+        time: SmoothedParameter,
+        feedback: Parameter,
+    }
+
+    impl Default for ManualParameters {
+        fn default() -> Self {
+            Self {
+                time: SmoothedParameter::from_descriptor(&MANUAL_DESCRIPTORS[0], 100.0),
+                feedback: Parameter::from_descriptor(&MANUAL_DESCRIPTORS[1]),
+            }
+        }
+    }
+
+    impl Sealed for ManualParameters {}
+
+    impl Nts3Parameters for ManualParameters {
+        const DESCRIPTORS: [UnitParam; UNIT_MAX_PARAM_COUNT] = MANUAL_DESCRIPTORS;
+        const MAPPINGS: [GenericfxParamMapping; UNIT_MAX_PARAM_COUNT] = MANUAL_MAPPINGS;
+        const COUNT: usize = 2;
+
+        fn get(&self, index: u8) -> Option<i32> {
+            match index {
+                0 => Some(i32::from(self.time.raw())),
+                1 => Some(i32::from(self.feedback.raw())),
+                _ => None,
+            }
+        }
+
+        fn set(&mut self, index: u8, value: i32) -> bool {
+            match index {
+                0 => {
+                    self.time.set(value);
+                    true
+                }
+                1 => {
+                    self.feedback.set(value);
+                    true
+                }
+                _ => false,
+            }
+        }
+
+        fn initialize_smoothers(&mut self, sample_rate: f32) {
+            self.time.set_sample_rate(sample_rate);
+        }
+
+        fn reset_smoothers(&mut self) {
+            self.time.reset_smoothing();
+        }
+
+        fn begin_block(&mut self) {
+            self.time.begin_block();
+        }
+
+        fn end_block(&mut self) {
+            self.time.end_block();
+        }
+
+        fn string_value(&self, index: u8, value: i32) -> Option<&'static core::ffi::CStr> {
+            (index == 1 && value >= 1_000).then_some(c"FULL")
+        }
+    }
+
+    #[derive(Default)]
+    struct ManualPlugin;
+
+    impl Nts3Plugin for ManualPlugin {
+        type Parameters = ManualParameters;
+
+        fn process(&mut self, parameters: &mut Self::Parameters, buffer: &mut StereoBuffer<'_>) {
+            for mut frame in buffer.frames_mut() {
+                frame.write([
+                    parameters.time.next_plain(),
+                    parameters.feedback.normalized(),
+                ]);
+            }
+        }
+    }
 
     #[derive(Default)]
     struct FailingPlugin;
@@ -791,6 +965,91 @@ mod tests {
         }
         assert_eq!(ALLOCATIONS.load(Ordering::SeqCst), expected.len());
         assert_eq!(FREES.load(Ordering::SeqCst), expected.len());
+    }
+
+    #[test]
+    fn manual_parameter_metadata_dispatch_and_runtime_hooks_stay_consistent() {
+        let _guard = TEST_SERIAL
+            .lock()
+            .unwrap_or_else(|error| error.into_inner());
+        CONSTRUCTION_ORDER.store(0, Ordering::SeqCst);
+
+        assert_eq!(ManualParameters::COUNT, 2);
+        assert_eq!(core::mem::size_of::<ManualPlugin>(), 0);
+        assert_eq!(core::mem::size_of::<ManualParameters>(), 44);
+        assert_eq!(
+            core::mem::size_of::<Runtime<ManualPlugin>>(),
+            if cfg!(target_pointer_width = "64") {
+                80
+            } else {
+                64
+            }
+        );
+        let defaults = ManualParameters::default();
+        assert_eq!(defaults.time.raw(), ManualParameters::DESCRIPTORS[0].init());
+        assert_eq!(
+            defaults.feedback.raw(),
+            ManualParameters::DESCRIPTORS[1].init()
+        );
+        assert_eq!(ManualParameters::MAPPINGS[0].min(), 1);
+        assert_eq!(ManualParameters::MAPPINGS[0].max(), 2_000);
+
+        let context = UnitRuntimeGenericfxContext::new(1024, 1024, None);
+        let descriptor = valid_descriptor(&context);
+        let mut controller = RuntimeController::<ManualPlugin>::new();
+        // SAFETY: descriptor/context remain readable throughout initialization.
+        assert_eq!(
+            unsafe { controller.initialize(&descriptor, 4096) },
+            UNIT_ERR_NONE
+        );
+        assert_eq!(controller.get_parameter(0), 500);
+        assert_eq!(controller.get_parameter(1), 0);
+        assert_eq!(controller.get_parameter(200), 0);
+        assert!(!controller.set_parameter(200, i32::MAX));
+        assert!(controller.parameter_string_value(200, 0).is_null());
+
+        assert!(controller.set_parameter(0, i32::MAX));
+        assert!(controller.set_parameter(1, i32::MAX));
+        assert_eq!(controller.get_parameter(0), 2_000);
+        assert_eq!(controller.get_parameter(1), 1_000);
+        assert!(!controller.parameter_string_value(1, 1_000).is_null());
+
+        let input = [0.0; 2];
+        let mut output = [0.0; 2];
+        // SAFETY: one separate stereo input/output frame is live for the call.
+        unsafe {
+            controller
+                .render(input.as_ptr(), output.as_mut_ptr(), 1)
+                .unwrap();
+        }
+        assert!(output[0] > 500.0 && output[0] < 2_000.0);
+        assert_eq!(output[1], 1.0);
+        assert_eq!(
+            controller
+                .state
+                .active_mut()
+                .unwrap()
+                .parameters
+                .time
+                .status(),
+            SmoothStatus::Active
+        );
+
+        // Reset retains targets while snapping in-flight smoothing to them.
+        assert!(controller.reset());
+        // SAFETY: one separate stereo input/output frame is live for the call.
+        unsafe {
+            controller
+                .render(input.as_ptr(), output.as_mut_ptr(), 1)
+                .unwrap();
+        }
+        assert_eq!(output, [2_000.0, 1.0]);
+
+        assert!(controller.suspend());
+        assert!(controller.set_parameter(1, i32::MIN));
+        assert_eq!(controller.get_parameter(1), 0);
+        assert!(controller.resume());
+        assert!(controller.teardown());
     }
 
     #[test]
