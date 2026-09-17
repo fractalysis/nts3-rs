@@ -8,3 +8,6 @@ publish = false
 name = "pass_through"
 path = "src/lib.rs"
 crate-type = ["staticlib"]
+
+[dependencies]
+nts3-sys = { path = "../../crates/nts3-sys" }

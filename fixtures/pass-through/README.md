@@ -1,8 +1,9 @@
-# Manual Rust pass-through spike
+# Rust pass-through fixture
 
-This crate intentionally duplicates the minimum NTS-3 ABI. It is evidence for
-the Rust/static-archive/GNU-linker path, not reusable framework API; Task 02
-replaces these definitions with audited `nts3-sys` types.
+This crate proves the Rust/static-archive/GNU-linker path while using the
+audited raw ABI definitions from `nts3-sys`. It deliberately contains only
+manual callbacks and pass-through DSP; later tasks replace those callbacks with
+the safe runtime and export macro.
 
 Build and perform the C/Rust ELF comparison in the pinned container:
 

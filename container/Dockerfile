@@ -9,6 +9,17 @@ ARG RUST_VERSION=1.85.1
 ARG RUST_HOST=x86_64-unknown-linux-gnu
 ARG RUST_ARCHIVE_SHA256=912c76f602f5f630138fca2388b2688c2c1aabcf823d71890b2b9155f743792e
 ARG RUST_STD_SHA256=a33639b80353077a37b4e313d0882b074fa30e8fe968c6d6d36334fc74b3a845
+ARG HOST_GCC_VERSION=4:9.3.0-1ubuntu2
+ARG HOST_LIBC_DEV_VERSION=2.31-0ubuntu9.18
+
+# The ABI harness executes a native C probe against the SDK headers. The base
+# SDK image intentionally contains only the ARM cross-compiler.
+RUN set -eux; \
+    apt-get update; \
+    apt-get install --no-install-recommends -y \
+        "gcc=${HOST_GCC_VERSION}" \
+        "libc6-dev=${HOST_LIBC_DEV_VERSION}"; \
+    rm -rf /var/lib/apt/lists/*
 
 # Install immutable Rust distribution archives directly. This avoids a moving
 # rustup bootstrap binary while retaining the exact target standard library.

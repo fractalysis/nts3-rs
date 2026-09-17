@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["fixtures/pass-through"]
+members = ["crates/nts3-sys", "fixtures/pass-through"]
 exclude = [
     "example/smooth-echo-nih-plug",
     "example/smooth-echo-nts3-plug",

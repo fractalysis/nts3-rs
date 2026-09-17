@@ -1,128 +1,60 @@
 #![no_std]
 
-use core::ffi::{c_char, c_void};
 #[cfg(not(test))]
 use core::panic::PanicInfo;
 use core::ptr;
+#[cfg(test)]
+use nts3_sys::UnitRuntimeHooks;
+use nts3_sys::{
+    GenericfxCurve, GenericfxParamMapping, GenericfxUnitHeader, UNIT_API_2_0_0,
+    UNIT_ERR_API_VERSION, UNIT_ERR_GEOMETRY, UNIT_ERR_NONE, UNIT_ERR_SAMPLERATE, UNIT_ERR_TARGET,
+    UNIT_ERR_UNDEF, UNIT_PARAM_TYPE_NONE, UNIT_TARGET_NTS3_KAOSS_GENERICFX, UNUSED_MAPPING,
+    UNUSED_PARAM, UnitHeader, UnitParam, UnitParamFormat, UnitRuntimeDescriptor,
+};
 
-const TARGET_NTS3_GENERICFX: u32 = (6 << 8) | 7;
-const API_2_0_0: u32 = 2 << 16;
 const SAMPLE_RATE: u32 = 48_000;
 const STEREO_CHANNELS: u8 = 2;
 
-const ERR_NONE: i8 = 0;
-const ERR_TARGET: i8 = -1;
-const ERR_API_VERSION: i8 = -2;
-const ERR_SAMPLE_RATE: i8 = -4;
-const ERR_GEOMETRY: i8 = -8;
-const ERR_UNDEFINED: i8 = -32;
+const TEST_PARAM: UnitParam = UnitParam::new(
+    0,
+    1,
+    0,
+    0,
+    UNIT_PARAM_TYPE_NONE,
+    UnitParamFormat::FIXED_ZERO,
+    *b"TEST\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0",
+);
 
-#[repr(C, packed)]
-#[derive(Clone, Copy)]
-struct UnitParam {
-    min: i16,
-    max: i16,
-    center: i16,
-    init: i16,
-    parameter_type: u8,
-    fraction: u8,
-    name: [u8; 22],
-}
-
-const UNUSED_PARAM: UnitParam = UnitParam {
-    min: 0,
-    max: 0,
-    center: 0,
-    init: 0,
-    parameter_type: 0,
-    fraction: 0,
-    name: [0; 22],
-};
-
-const TEST_PARAM: UnitParam = UnitParam {
-    min: 0,
-    max: 1,
-    center: 0,
-    init: 0,
-    parameter_type: 0,
-    fraction: 0,
-    name: *b"TEST\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0",
-};
-
-#[repr(C, packed)]
-#[derive(Clone, Copy)]
-struct GenericFxParamMapping {
-    assign: u8,
-    curve_and_polarity: u8,
-    min: i16,
-    max: i16,
-    value: i16,
-}
-
-const UNUSED_MAPPING: GenericFxParamMapping = GenericFxParamMapping {
-    assign: 0,
-    curve_and_polarity: 0,
-    min: 0,
-    max: 0,
-    value: 0,
-};
-
-const TEST_MAPPING: GenericFxParamMapping = GenericFxParamMapping {
-    assign: 0,
-    curve_and_polarity: 0,
-    min: 0,
-    max: 1,
-    value: 0,
-};
-
-#[repr(C, packed)]
-struct UnitHeader {
-    header_size: u32,
-    target: u32,
-    api: u32,
-    developer_id: u32,
-    unit_id: u32,
-    version: u32,
-    name: [u8; 20],
-    reserved0: u32,
-    reserved1: u32,
-    num_params: u32,
-    params: [UnitParam; 8],
-    default_mappings: [GenericFxParamMapping; 8],
-}
-
-const _: () = assert!(core::mem::size_of::<UnitParam>() == 32);
-const _: () = assert!(core::mem::size_of::<GenericFxParamMapping>() == 8);
-const _: () = assert!(core::mem::size_of::<UnitHeader>() == 376);
-const _: () = assert!(core::mem::align_of::<UnitHeader>() == 1);
+const TEST_MAPPING: GenericfxParamMapping =
+    GenericfxParamMapping::new(0, GenericfxCurve::LINEAR_UNIPOLAR, 0, 1, 0);
 
 const UNIT_NAME: [u8; 20] = *b"Rust Pass Through\0\0\0";
 
 #[used]
 #[unsafe(no_mangle)]
 #[unsafe(link_section = ".unit_header")]
-static unit_header: UnitHeader = UnitHeader {
-    header_size: core::mem::size_of::<UnitHeader>() as u32,
-    target: TARGET_NTS3_GENERICFX,
-    api: API_2_0_0,
-    developer_id: 0x5255_5354,
-    unit_id: 0x5041_5353,
-    version: 0x0001_0000,
-    name: UNIT_NAME,
-    reserved0: 0,
-    reserved1: 0,
-    num_params: 1,
-    params: [
-        TEST_PARAM,
-        UNUSED_PARAM,
-        UNUSED_PARAM,
-        UNUSED_PARAM,
-        UNUSED_PARAM,
-        UNUSED_PARAM,
-        UNUSED_PARAM,
-        UNUSED_PARAM,
-    ],
-    default_mappings: [
+static unit_header: GenericfxUnitHeader = GenericfxUnitHeader::new(
+    UnitHeader::new(
+        core::mem::size_of::<GenericfxUnitHeader>() as u32,
+        UNIT_TARGET_NTS3_KAOSS_GENERICFX,
+        UNIT_API_2_0_0,
+        0x5255_5354,
+        0x5041_5353,
+        0x0001_0000,
+        UNIT_NAME,
+        1,
+        [
+            TEST_PARAM,
+            UNUSED_PARAM,
+            UNUSED_PARAM,
+            UNUSED_PARAM,
+            UNUSED_PARAM,
+            UNUSED_PARAM,
+            UNUSED_PARAM,
+            UNUSED_PARAM,
+        ],
+    ),
+    [
         TEST_MAPPING,
         UNUSED_MAPPING,
         UNUSED_MAPPING,
@@ -132,63 +64,38 @@ static unit_header: UnitHeader = UnitHeader {
         UNUSED_MAPPING,
         UNUSED_MAPPING,
     ],
-};
-
-#[repr(C)]
-#[derive(Clone, Copy)]
-struct RuntimeHooks {
-    runtime_context: *const c_void,
-    sdram_alloc: Option<unsafe extern "C" fn(usize) -> *mut u8>,
-    sdram_free: Option<unsafe extern "C" fn(*const u8)>,
-    sdram_avail: Option<unsafe extern "C" fn() -> usize>,
-}
-
-#[repr(C, packed)]
-#[derive(Clone, Copy)]
-pub struct RuntimeDescriptor {
-    target: u32,
-    api: u32,
-    sample_rate: u32,
-    frames_per_buffer: u16,
-    input_channels: u8,
-    output_channels: u8,
-    hooks: RuntimeHooks,
-}
-
-#[cfg(target_pointer_width = "32")]
-const _: () = assert!(core::mem::size_of::<RuntimeHooks>() == 16);
-#[cfg(target_pointer_width = "32")]
-const _: () = assert!(core::mem::size_of::<RuntimeDescriptor>() == 32);
+);
 
 /// # Safety
 /// `descriptor` must point to a readable SDK runtime descriptor for this call.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn unit_init(descriptor: *const RuntimeDescriptor) -> i8 {
+pub unsafe extern "C" fn unit_init(descriptor: *const UnitRuntimeDescriptor) -> i8 {
     if descriptor.is_null() {
-        return ERR_UNDEFINED;
+        return UNIT_ERR_UNDEF;
     }
 
     // SAFETY: the runtime promises a readable descriptor pointer for this call.
     // Its C type is packed, so an explicitly unaligned copy is required.
     let descriptor = unsafe { descriptor.read_unaligned() };
 
-    if descriptor.target != TARGET_NTS3_GENERICFX {
-        return ERR_TARGET;
+    if descriptor.target() != UNIT_TARGET_NTS3_KAOSS_GENERICFX {
+        return UNIT_ERR_TARGET;
     }
-    let api_major = descriptor.api & 0x007f_0000;
-    let api_minor = descriptor.api & 0x0000_7f00;
-    if api_major != API_2_0_0 || api_minor != 0 {
-        return ERR_API_VERSION;
+    let api_major = descriptor.api() & 0x007f_0000;
+    let api_minor = descriptor.api() & 0x0000_7f00;
+    if api_major != UNIT_API_2_0_0 || api_minor != 0 {
+        return UNIT_ERR_API_VERSION;
     }
-    if descriptor.sample_rate != SAMPLE_RATE {
-        return ERR_SAMPLE_RATE;
+    if descriptor.sample_rate() != SAMPLE_RATE {
+        return UNIT_ERR_SAMPLERATE;
     }
-    if descriptor.input_channels != STEREO_CHANNELS || descriptor.output_channels != STEREO_CHANNELS
+    if descriptor.input_channels() != STEREO_CHANNELS
+        || descriptor.output_channels() != STEREO_CHANNELS
     {
-        return ERR_GEOMETRY;
+        return UNIT_ERR_GEOMETRY;
     }
 
-    ERR_NONE
+    UNIT_ERR_NONE
 }
 
 #[unsafe(no_mangle)]
@@ -229,10 +136,10 @@ pub extern "C" fn unit_get_param_value(_id: u8) -> i32 {
     0
 }
 
-static EMPTY_STRING: [c_char; 1] = [0];
+static EMPTY_STRING: [core::ffi::c_char; 1] = [0];
 
 #[unsafe(no_mangle)]
-pub extern "C" fn unit_get_param_str_value(_id: u8, _value: i32) -> *const c_char {
+pub extern "C" fn unit_get_param_str_value(_id: u8, _value: i32) -> *const core::ffi::c_char {
     EMPTY_STRING.as_ptr()
 }
 
@@ -260,36 +167,38 @@ fn panic(_info: &PanicInfo<'_>) -> ! {
 mod tests {
     use super::*;
 
-    fn descriptor() -> RuntimeDescriptor {
-        RuntimeDescriptor {
-            target: TARGET_NTS3_GENERICFX,
-            api: API_2_0_0,
-            sample_rate: SAMPLE_RATE,
-            frames_per_buffer: 64,
-            input_channels: STEREO_CHANNELS,
-            output_channels: STEREO_CHANNELS,
-            hooks: RuntimeHooks {
-                runtime_context: ptr::null(),
-                sdram_alloc: None,
-                sdram_free: None,
-                sdram_avail: None,
-            },
-        }
+    fn descriptor() -> UnitRuntimeDescriptor {
+        UnitRuntimeDescriptor::new(
+            UNIT_TARGET_NTS3_KAOSS_GENERICFX,
+            UNIT_API_2_0_0,
+            SAMPLE_RATE,
+            64,
+            STEREO_CHANNELS,
+            STEREO_CHANNELS,
+            UnitRuntimeHooks::new(ptr::null(), None, None, None),
+        )
     }
 
     #[test]
     fn validates_runtime_descriptor() {
         let valid = descriptor();
         // SAFETY: `valid` remains readable for the duration of the call.
-        assert_eq!(unsafe { unit_init(&valid) }, ERR_NONE);
+        assert_eq!(unsafe { unit_init(&valid) }, UNIT_ERR_NONE);
 
-        let mut wrong_api = descriptor();
-        wrong_api.api = (2 << 16) | (1 << 8);
+        let wrong_api = UnitRuntimeDescriptor::new(
+            UNIT_TARGET_NTS3_KAOSS_GENERICFX,
+            (2 << 16) | (1 << 8),
+            SAMPLE_RATE,
+            64,
+            STEREO_CHANNELS,
+            STEREO_CHANNELS,
+            UnitRuntimeHooks::new(ptr::null(), None, None, None),
+        );
         // SAFETY: `wrong_api` remains readable for the duration of the call.
-        assert_eq!(unsafe { unit_init(&wrong_api) }, ERR_API_VERSION);
+        assert_eq!(unsafe { unit_init(&wrong_api) }, UNIT_ERR_API_VERSION);
 
         // SAFETY: null is explicitly accepted and rejected before dereference.
-        assert_eq!(unsafe { unit_init(ptr::null()) }, ERR_UNDEFINED);
+        assert_eq!(unsafe { unit_init(ptr::null()) }, UNIT_ERR_UNDEF);
     }
 
     #[test]
