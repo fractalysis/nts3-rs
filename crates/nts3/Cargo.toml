@@ -1,0 +1,14 @@
+[package]
+name = "nts3"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+description = "Safe no_std framework core for Korg NTS-3 generic effects"
+publish = false
+
+[dependencies]
+nts3-sys = { path = "../nts3-sys" }
+
+[[example]]
+name = "allocating-probe"
+path = "examples/allocating_probe.rs"

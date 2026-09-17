@@ -3,6 +3,13 @@
 version = 4
 
 [[package]]
+name = "nts3"
+version = "0.1.0"
+dependencies = [
+ "nts3-sys",
+]
+
+[[package]]
 name = "nts3-sys"
 version = "0.1.0"
 
