@@ -1,3 +1,4 @@
+use core::cell::UnsafeCell;
 use core::ffi::c_char;
 use core::marker::PhantomData;
 use core::ptr;
@@ -285,6 +286,117 @@ impl<P: Nts3Plugin> RuntimeController<P> {
 }
 
 impl<P: Nts3Plugin> Default for RuntimeController<P> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Process-global callback storage used by the generated ABI adapter.
+///
+/// Korg's unit ABI supplies no instance pointer. Like the SDK C++ template,
+/// callbacks therefore mutate one process-global runtime under the host's
+/// serialized lifecycle contract.
+#[doc(hidden)]
+pub struct ExportRuntime<P: Nts3Plugin> {
+    controller: UnsafeCell<RuntimeController<P>>,
+}
+
+// SAFETY: NTS-3 serializes callbacks for one loaded unit instance. The same
+// assumption is used by Korg's plain-mutable C++ template and by the framework
+// allocator. No reference to the controller escapes an individual callback.
+unsafe impl<P: Nts3Plugin> Sync for ExportRuntime<P> {}
+
+impl<P: Nts3Plugin> ExportRuntime<P> {
+    pub const fn new() -> Self {
+        Self {
+            controller: UnsafeCell::new(RuntimeController::new()),
+        }
+    }
+
+    fn with_controller<R>(&self, callback: impl FnOnce(&mut RuntimeController<P>) -> R) -> R {
+        // SAFETY: `ExportRuntime` documents the serialized foreign callback
+        // contract, and the mutable reference cannot escape this closure.
+        unsafe { callback(&mut *self.controller.get()) }
+    }
+
+    /// # Safety
+    /// A non-null descriptor must be readable and follow the Korg genericfx
+    /// runtime contract for this call.
+    pub unsafe fn initialize(&self, descriptor: *const UnitRuntimeDescriptor, sdram: u32) -> i8 {
+        self.with_controller(|controller| {
+            // SAFETY: this method forwards its caller's descriptor contract.
+            unsafe { controller.initialize(descriptor, sdram) }
+        })
+    }
+
+    pub fn teardown(&self) {
+        self.with_controller(|controller| {
+            controller.teardown();
+        });
+    }
+
+    pub fn reset(&self) {
+        self.with_controller(|controller| {
+            controller.reset();
+        });
+    }
+
+    pub fn resume(&self) {
+        self.with_controller(|controller| {
+            controller.resume();
+        });
+    }
+
+    pub fn suspend(&self) {
+        self.with_controller(|controller| {
+            controller.suspend();
+        });
+    }
+
+    /// # Safety
+    /// For nonzero frames, input/output must cover interleaved stereo buffers
+    /// and be disjoint or exactly equal.
+    pub unsafe fn render(&self, input: *const f32, output: *mut f32, frames: u32) {
+        self.with_controller(|controller| {
+            // SAFETY: this method forwards its caller's buffer contract.
+            let _ = unsafe { controller.render(input, output, frames) };
+        });
+    }
+
+    pub fn get_parameter(&self, id: u8) -> i32 {
+        self.with_controller(|controller| controller.get_parameter(id))
+    }
+
+    pub fn parameter_string_value(&self, id: u8, value: i32) -> *const c_char {
+        self.with_controller(|controller| controller.parameter_string_value(id, value))
+    }
+
+    pub fn set_parameter(&self, id: u8, value: i32) {
+        self.with_controller(|controller| {
+            controller.set_parameter(id, value);
+        });
+    }
+
+    pub fn set_tempo(&self, tempo: u32) {
+        self.with_controller(|controller| {
+            controller.set_tempo(tempo);
+        });
+    }
+
+    pub fn tempo_4ppqn_tick(&self, counter: u32) {
+        self.with_controller(|controller| {
+            controller.tempo_4ppqn_tick(counter);
+        });
+    }
+
+    pub fn touch_event(&self, id: u8, phase: u8, x: u32, y: u32) {
+        self.with_controller(|controller| {
+            controller.touch_event(id, phase, x, y);
+        });
+    }
+}
+
+impl<P: Nts3Plugin> Default for ExportRuntime<P> {
     fn default() -> Self {
         Self::new()
     }

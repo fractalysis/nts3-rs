@@ -1,7 +1,7 @@
 # Reproducible NTS-3 build container
 
 The image derives from the locally verified Korg SDK environment by immutable
-manifest digest and installs the checksum-verified Rust 1.85.1 host distribution
+manifest digest and installs the checksum-verified Rust 1.98.1 host distribution
 plus `thumbv7em-none-eabihf` standard library. It also installs pinned Ubuntu
 native GCC/libc development packages so the SDK-header ABI probe can execute in
 the container. The base can be changed only via an explicit
@@ -29,7 +29,7 @@ Actual binaries in that image (the SDK README's 10.3 label does not match):
 
 - `arm-none-eabi-gcc`: 9.2.1 20191025, Ubuntu package 15:9-2019-q4
 - GNU `ld`, `ar`, `readelf`, `objdump`, and `strip`: 2.34
-- Rust/Cargo: 1.85.1
+- Rust/Cargo: 1.98.1
 - native GCC (ABI probe): Ubuntu GCC 9 package
 - target: `thumbv7em-none-eabihf`
 

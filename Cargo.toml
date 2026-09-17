@@ -7,10 +7,10 @@ members = [
     "fixtures/parameter-derive",
     "fixtures/pass-through",
     "fixtures/touch-probe",
+    "example/smooth-echo-nts3-plug",
 ]
 exclude = [
     "example/smooth-echo-nih-plug",
-    "example/smooth-echo-nts3-plug",
 ]
 
 [profile.dev]

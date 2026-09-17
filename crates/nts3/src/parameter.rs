@@ -473,17 +473,17 @@ mod tests {
         adapted.set(8.0);
 
         for (block_index, &frames) in blocks.iter().enumerate() {
-            if let Some((at, value)) = retarget_at {
-                if block_index == at {
-                    reference.set(value);
-                    adapted.set(value);
-                }
+            if let Some((at, value)) = retarget_at
+                && block_index == at
+            {
+                reference.set(value);
+                adapted.set(value);
             }
-            if let Some((at, value)) = reset_at {
-                if block_index == at {
-                    reference.reset(value);
-                    adapted.reset(value);
-                }
+            if let Some((at, value)) = reset_at
+                && block_index == at
+            {
+                reference.reset(value);
+                adapted.reset(value);
             }
 
             reference.process(frames);

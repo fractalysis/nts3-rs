@@ -1,0 +1,5 @@
+error: #[nts3::plugin] must be applied to an impl of Nts3Plugin
+ --> tests/ui/plugin-fail-wrong-trait.rs:5:6
+  |
+5 | impl NotAPlugin for Plugin {}
+  |      ^^^^^^^^^^

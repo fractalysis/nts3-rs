@@ -3,11 +3,348 @@
 use proc_macro::TokenStream;
 use proc_macro2::Span;
 use quote::quote;
+use syn::parse::{Parse, ParseStream};
+use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
-use syn::{Data, DeriveInput, Expr, ExprLit, ExprUnary, Fields, Lit, LitStr, Type, UnOp};
+use syn::{
+    Data, DeriveInput, Expr, ExprLit, ExprUnary, Fields, ItemImpl, Lit, LitStr, Meta,
+    MetaNameValue, Token, Type, UnOp,
+};
 
 const MAX_PARAMETERS: usize = 8;
 const PARAMETER_NAME_LEN: usize = 21;
+const UNIT_NAME_LEN: usize = 19;
+const PLATFORM_SDRAM_LIMIT: u64 = 3 * 1024 * 1024;
+
+/// Generates the complete NTS-3 genericfx header and callback adapter for one
+/// concrete `Nts3Plugin` implementation.
+#[proc_macro_attribute]
+pub fn plugin(arguments: TokenStream, input: TokenStream) -> TokenStream {
+    let arguments = syn::parse_macro_input!(arguments as PluginArguments);
+    let implementation = syn::parse_macro_input!(input as ItemImpl);
+    match expand_plugin(arguments, implementation) {
+        Ok(tokens) => tokens.into(),
+        Err(error) => error.into_compile_error().into(),
+    }
+}
+
+#[derive(Default)]
+struct PluginArguments {
+    name: Option<(String, Span)>,
+    developer_id: Option<(u32, Span)>,
+    unit_id: Option<(u32, Span)>,
+    sdram_bytes: Option<(u32, Span)>,
+}
+
+impl Parse for PluginArguments {
+    fn parse(input: ParseStream<'_>) -> syn::Result<Self> {
+        let metadata = Punctuated::<Meta, Token![,]>::parse_terminated(input)?;
+        let mut arguments = Self::default();
+        for meta in metadata {
+            let Meta::NameValue(MetaNameValue { path, value, .. }) = meta else {
+                return Err(syn::Error::new(
+                    meta.span(),
+                    "plugin options must use `name = value` syntax",
+                ));
+            };
+            let Some(key) = path.get_ident().map(ToString::to_string) else {
+                return Err(syn::Error::new(
+                    path.span(),
+                    "plugin option must be an identifier",
+                ));
+            };
+            match key.as_str() {
+                "name" => {
+                    let Expr::Lit(ExprLit {
+                        lit: Lit::Str(value),
+                        ..
+                    }) = value
+                    else {
+                        return Err(syn::Error::new(
+                            value.span(),
+                            "plugin name must be a string literal",
+                        ));
+                    };
+                    let span = value.span();
+                    set_once(&mut arguments.name, (value.value(), span), span, "name")?;
+                }
+                "developer_id" | "unit_id" | "sdram_bytes" => {
+                    let parsed = parse_unsigned_integer(&value)?;
+                    let converted = u32::try_from(parsed).map_err(|_| {
+                        syn::Error::new(
+                            value.span(),
+                            format!("`{key}` must fit an unsigned 32-bit integer"),
+                        )
+                    })?;
+                    match key.as_str() {
+                        "developer_id" => set_once(
+                            &mut arguments.developer_id,
+                            (converted, value.span()),
+                            value.span(),
+                            "developer_id",
+                        )?,
+                        "unit_id" => set_once(
+                            &mut arguments.unit_id,
+                            (converted, value.span()),
+                            value.span(),
+                            "unit_id",
+                        )?,
+                        "sdram_bytes" => set_once(
+                            &mut arguments.sdram_bytes,
+                            (converted, value.span()),
+                            value.span(),
+                            "sdram_bytes",
+                        )?,
+                        _ => unreachable!(),
+                    }
+                }
+                _ => {
+                    return Err(syn::Error::new(
+                        path.span(),
+                        format!("unknown plugin option `{key}`"),
+                    ));
+                }
+            }
+        }
+        Ok(arguments)
+    }
+}
+
+fn expand_plugin(
+    arguments: PluginArguments,
+    implementation: ItemImpl,
+) -> syn::Result<proc_macro2::TokenStream> {
+    if !implementation.generics.params.is_empty() || implementation.generics.where_clause.is_some()
+    {
+        return Err(syn::Error::new(
+            implementation.generics.span(),
+            "#[nts3::plugin] requires a concrete, non-generic trait implementation",
+        ));
+    }
+    let Some((negative, trait_path, _)) = &implementation.trait_ else {
+        return Err(syn::Error::new(
+            implementation.impl_token.span(),
+            "#[nts3::plugin] must be applied to an impl of Nts3Plugin",
+        ));
+    };
+    let implements_nts3_plugin = trait_path
+        .segments
+        .last()
+        .is_some_and(|segment| segment.ident == "Nts3Plugin");
+    if negative.is_some() || !implements_nts3_plugin {
+        return Err(syn::Error::new(
+            trait_path.span(),
+            "#[nts3::plugin] must be applied to an impl of Nts3Plugin",
+        ));
+    }
+
+    let self_type = &implementation.self_ty;
+    let metadata_span = implementation.impl_token.span();
+    let (name, name_span) = required(arguments.name, metadata_span, "name")?;
+    let encoded_name = encode_sdk_name(&name, name_span, UNIT_NAME_LEN, "unit")?;
+    let (developer_id, developer_span) =
+        required(arguments.developer_id, metadata_span, "developer_id")?;
+    if developer_id == 0 || is_korg_id(developer_id) {
+        return Err(syn::Error::new(
+            developer_span,
+            "developer_id is reserved; zero and every upper/lower-case spelling of KORG are forbidden",
+        ));
+    }
+    let (unit_id, _) = required(arguments.unit_id, metadata_span, "unit_id")?;
+    let (sdram_bytes, sdram_span) = required(arguments.sdram_bytes, metadata_span, "sdram_bytes")?;
+    if sdram_bytes == 0 {
+        return Err(syn::Error::new(
+            sdram_span,
+            "sdram_bytes must be greater than zero",
+        ));
+    }
+    if u64::from(sdram_bytes) > PLATFORM_SDRAM_LIMIT {
+        return Err(syn::Error::new(
+            sdram_span,
+            "sdram_bytes exceeds the NTS-3 3 MiB per-runtime limit",
+        ));
+    }
+
+    let major = cargo_version_component("CARGO_PKG_VERSION_MAJOR", metadata_span)?;
+    let minor = cargo_version_component("CARGO_PKG_VERSION_MINOR", metadata_span)?;
+    let patch = cargo_version_component("CARGO_PKG_VERSION_PATCH", metadata_span)?;
+    let packed_version = pack_version(major, minor, patch, metadata_span)?;
+    let name_bytes = encoded_name.iter();
+
+    Ok(quote! {
+        #implementation
+
+        // A macro_export item always occupies the invoking crate's root macro
+        // namespace, even when this attribute is inside a module. A second
+        // plugin attribute therefore receives a direct duplicate-definition
+        // diagnostic before an artifact with ambiguous exports can be built.
+        #[doc(hidden)]
+        #[macro_export]
+        macro_rules! __nts3_one_exported_plugin_per_artifact { () => {}; }
+
+        ::nts3::__install_runtime_glue!();
+
+        #[doc(hidden)]
+        #[used]
+        #[unsafe(no_mangle)]
+        #[unsafe(link_section = ".unit_header")]
+        pub static unit_header: ::nts3::__private::GenericfxUnitHeader =
+            ::nts3::__private::GenericfxUnitHeader::new(
+                ::nts3::__private::UnitHeader::new(
+                    ::core::mem::size_of::<::nts3::__private::GenericfxUnitHeader>() as u32,
+                    ::nts3::__private::UNIT_TARGET_NTS3_KAOSS_GENERICFX,
+                    ::nts3::__private::UNIT_API_VERSION,
+                    #developer_id,
+                    #unit_id,
+                    #packed_version,
+                    [#(#name_bytes,)*],
+                    <<#self_type as ::nts3::Nts3Plugin>::Parameters as ::nts3::Nts3Parameters>::COUNT as u32,
+                    <<#self_type as ::nts3::Nts3Plugin>::Parameters as ::nts3::Nts3Parameters>::DESCRIPTORS,
+                ),
+                <<#self_type as ::nts3::Nts3Plugin>::Parameters as ::nts3::Nts3Parameters>::MAPPINGS,
+            );
+
+        #[doc(hidden)]
+        #[used]
+        #[unsafe(no_mangle)]
+        #[unsafe(link_section = ".nts3_resources")]
+        pub static nts3_resources: ::nts3::__private::ResourceRecord =
+            ::nts3::__private::ResourceRecord::new(#sdram_bytes);
+
+        #[doc(hidden)]
+        static __NTS3_RUNTIME: ::nts3::runtime::ExportRuntime<#self_type> =
+            ::nts3::runtime::ExportRuntime::new();
+
+        /// # Safety
+        /// The descriptor must satisfy the Korg NTS-3 runtime ABI for this call.
+        #[unsafe(no_mangle)]
+        pub unsafe extern "C" fn unit_init(
+            descriptor: *const ::nts3::__private::UnitRuntimeDescriptor,
+        ) -> i8 {
+            // SAFETY: the foreign caller supplies the descriptor under the SDK
+            // contract; the runtime validates all readable metadata and hooks.
+            unsafe { __NTS3_RUNTIME.initialize(descriptor, #sdram_bytes) }
+        }
+
+        #[unsafe(no_mangle)]
+        pub extern "C" fn unit_teardown() { __NTS3_RUNTIME.teardown(); }
+
+        #[unsafe(no_mangle)]
+        pub extern "C" fn unit_reset() { __NTS3_RUNTIME.reset(); }
+
+        #[unsafe(no_mangle)]
+        pub extern "C" fn unit_resume() { __NTS3_RUNTIME.resume(); }
+
+        #[unsafe(no_mangle)]
+        pub extern "C" fn unit_suspend() { __NTS3_RUNTIME.suspend(); }
+
+        /// # Safety
+        /// For nonzero frames, pointers must cover interleaved stereo buffers
+        /// and be disjoint or exactly equal as required by the SDK.
+        #[unsafe(no_mangle)]
+        pub unsafe extern "C" fn unit_render(
+            input: *const f32,
+            output: *mut f32,
+            frames: u32,
+        ) {
+            // SAFETY: the foreign caller owns the audio buffers under the SDK
+            // contract; the runtime bounds their use to this callback.
+            unsafe { __NTS3_RUNTIME.render(input, output, frames); }
+        }
+
+        #[unsafe(no_mangle)]
+        pub extern "C" fn unit_get_param_value(id: u8) -> i32 {
+            __NTS3_RUNTIME.get_parameter(id)
+        }
+
+        #[unsafe(no_mangle)]
+        pub extern "C" fn unit_get_param_str_value(
+            id: u8,
+            value: i32,
+        ) -> *const ::core::ffi::c_char {
+            __NTS3_RUNTIME.parameter_string_value(id, value)
+        }
+
+        #[unsafe(no_mangle)]
+        pub extern "C" fn unit_set_param_value(id: u8, value: i32) {
+            __NTS3_RUNTIME.set_parameter(id, value);
+        }
+
+        #[unsafe(no_mangle)]
+        pub extern "C" fn unit_set_tempo(tempo: u32) {
+            __NTS3_RUNTIME.set_tempo(tempo);
+        }
+
+        #[unsafe(no_mangle)]
+        pub extern "C" fn unit_tempo_4ppqn_tick(counter: u32) {
+            __NTS3_RUNTIME.tempo_4ppqn_tick(counter);
+        }
+
+        #[unsafe(no_mangle)]
+        pub extern "C" fn unit_touch_event(id: u8, phase: u8, x: u32, y: u32) {
+            __NTS3_RUNTIME.touch_event(id, phase, x, y);
+        }
+    })
+}
+
+fn cargo_version_component(name: &str, span: Span) -> syn::Result<u32> {
+    let value = std::env::var(name).map_err(|_| {
+        syn::Error::new(
+            span,
+            format!("Cargo did not provide `{name}` to #[nts3::plugin]"),
+        )
+    })?;
+    value.parse().map_err(|_| {
+        syn::Error::new(
+            span,
+            format!("Cargo package version component `{value}` is not an integer"),
+        )
+    })
+}
+
+fn pack_version(major: u32, minor: u32, patch: u32, span: Span) -> syn::Result<u32> {
+    if major > 0x7f || minor > 0x7f || patch > 0x7f {
+        return Err(syn::Error::new(
+            span,
+            "Cargo package version components must each fit the Korg 7-bit range 0..=127",
+        ));
+    }
+    Ok((major << 16) | (minor << 8) | patch)
+}
+
+fn is_korg_id(identifier: u32) -> bool {
+    identifier
+        .to_be_bytes()
+        .into_iter()
+        .zip(*b"korg")
+        .all(|(actual, expected)| actual.to_ascii_lowercase() == expected)
+}
+
+fn encode_sdk_name(value: &str, span: Span, maximum: usize, kind: &str) -> syn::Result<Vec<u8>> {
+    if value.is_empty() {
+        return Err(syn::Error::new(
+            span,
+            format!("{kind} name must not be empty"),
+        ));
+    }
+    if value.len() > maximum {
+        return Err(syn::Error::new(
+            span,
+            format!("{kind} name must be at most {maximum} characters"),
+        ));
+    }
+    if !value.bytes().all(valid_sdk_character) {
+        return Err(syn::Error::new(
+            span,
+            format!(
+                "{kind} name contains an invalid character; use 7-bit letters, digits, space, `-`, or `_`"
+            ),
+        ));
+    }
+    let mut encoded = vec![0; maximum + 1];
+    encoded[..value.len()].copy_from_slice(value.as_bytes());
+    Ok(encoded)
+}
 
 #[proc_macro_derive(Nts3Parameters, attributes(parameter))]
 pub fn derive_nts3_parameters(input: TokenStream) -> TokenStream {
@@ -489,9 +826,11 @@ fn validate_parameter(
         )
     })?;
 
-    if raw.decimal_places.is_some() && raw.fixed_fraction_bits.is_some() {
+    if raw.decimal_places.is_some()
+        && let Some((_, span)) = raw.fixed_fraction_bits
+    {
         return Err(syn::Error::new(
-            raw.fixed_fraction_bits.expect("present").1,
+            span,
             "`decimal_places` and `fixed_fraction_bits` are mutually exclusive",
         ));
     }
@@ -765,5 +1104,42 @@ fn mapping_tokens(spec: &ParameterSpec) -> proc_macro2::TokenStream {
             #max,
             #default
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn korg_case_variants_and_zero_are_reserved() {
+        for first in *b"Kk" {
+            for second in *b"Oo" {
+                for third in *b"Rr" {
+                    for fourth in *b"Gg" {
+                        assert!(is_korg_id(u32::from_be_bytes([
+                            first, second, third, fourth,
+                        ])));
+                    }
+                }
+            }
+        }
+        assert!(!is_korg_id(0));
+        assert!(!is_korg_id(u32::from_be_bytes(*b"RUST")));
+    }
+
+    #[test]
+    fn package_version_uses_korg_seven_bit_components() {
+        assert_eq!(
+            pack_version(1, 2, 3, Span::call_site()).unwrap(),
+            0x0001_0203
+        );
+        assert_eq!(
+            pack_version(127, 127, 127, Span::call_site()).unwrap(),
+            0x007f_7f7f
+        );
+        assert!(pack_version(128, 0, 0, Span::call_site()).is_err());
+        assert!(pack_version(0, 128, 0, Span::call_site()).is_err());
+        assert!(pack_version(0, 0, 128, Span::call_site()).is_err());
     }
 }

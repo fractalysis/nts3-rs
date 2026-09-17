@@ -60,6 +60,7 @@ arm-none-eabi-gcc \
     -Wl,--undefined=unit_set_tempo \
     -Wl,--undefined=unit_tempo_4ppqn_tick \
     -Wl,--undefined=unit_touch_event \
+    -Wl,--undefined=nts3_resources \
     -lc \
     -lm \
     -lgcc \

@@ -1,0 +1,5 @@
+error: unit name must be at most 19 characters
+ --> tests/ui/plugin-fail-name-long.rs:9:12
+  |
+9 |     name = "This Plugin Name Is Too Long",
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

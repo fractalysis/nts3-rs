@@ -1,0 +1,5 @@
+error: developer_id is reserved; zero and every upper/lower-case spelling of KORG are forbidden
+ --> tests/ui/plugin-fail-zero-developer.rs:8:50
+  |
+8 | #[nts3::plugin(name = "Reserved", developer_id = 0, unit_id = 1, sdram_bytes = 1024)]
+  |                                                  ^

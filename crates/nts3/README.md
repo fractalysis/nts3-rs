@@ -11,7 +11,9 @@ Target-safe framework core for Korg NTS-3 `genericfx` units.
 - typed `TouchPhase`/`TouchEvent` values with raw, clamped, and normalized
   positions independent of active state;
 - compact integer-backed `Parameter` and per-sample `SmoothedParameter` values;
-- the host-only `Nts3Parameters` derive, reexported through the facade/prelude.
+- the host-only `Nts3Parameters` derive, reexported through the facade/prelude;
+- `#[nts3::plugin(...)]`, which generates the header, resource record, complete
+  C callback surface, runtime singleton, target allocator, and panic policy.
 
 The runtime validates the SDK descriptor before state construction, owns plugin
 and parameter state, refreshes optional raw input for each render, bounds frame
@@ -32,9 +34,11 @@ no-op: plugin state is dropped first during teardown, then the untouched pointer
 returned by `sdram_alloc` is passed once to `sdram_free`.
 
 On target, allocation before activation, after sealing, or beyond the declared
-budget enters a non-formatting, non-unwinding fault loop. The generated plugin
-adapter will invoke the hidden runtime-glue macro once in the final plugin crate
-to install this allocator and panic policy.
+budget enters a non-formatting, non-unwinding fault loop. The plugin attribute
+invokes hidden runtime glue once in the final plugin crate to install this
+allocator and panic policy. It also emits a 12-byte versioned
+`.nts3_resources` record containing the exact declared SDRAM budget. Host
+expansions install neither allocator nor panic handler.
 
 Host code can use `nts3::host::HostArena` with `FrameworkAllocator` as its global
 allocator to measure construction allocations with the same bump accounting.

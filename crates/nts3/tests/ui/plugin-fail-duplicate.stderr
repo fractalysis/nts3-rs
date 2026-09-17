@@ -1,0 +1,21 @@
+error[E0428]: the name `__nts3_one_exported_plugin_per_artifact` is defined multiple times
+  --> tests/ui/plugin-fail-duplicate.rs:30:5
+   |
+12 | /     #[nts3::plugin(
+13 | |         name = "Duplicate One",
+14 | |         developer_id = 0x5255_5354,
+15 | |         unit_id = 1,
+16 | |         sdram_bytes = 1
+17 | |     )]
+   | |______- previous definition of the macro `__nts3_one_exported_plugin_per_artifact` here
+...
+30 | /     #[nts3::plugin(
+31 | |         name = "Duplicate Two",
+32 | |         developer_id = 0x5255_5354,
+33 | |         unit_id = 2,
+34 | |         sdram_bytes = 1
+35 | |     )]
+   | |______^ `__nts3_one_exported_plugin_per_artifact` redefined here
+   |
+   = note: `__nts3_one_exported_plugin_per_artifact` must be defined only once in the macro namespace of this module
+   = note: this error originates in the attribute macro `nts3::plugin` (in Nightly builds, run with -Z macro-backtrace for more info)

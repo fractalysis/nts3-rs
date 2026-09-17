@@ -257,7 +257,9 @@ mod tests {
 
     fn expected(input: &[f32]) -> std::vec::Vec<f32> {
         input
-            .chunks_exact(2)
+            .as_chunks::<2>()
+            .0
+            .iter()
             .flat_map(|frame| [frame[0] * 0.5 + frame[1], frame[1] * -0.25 - frame[0]])
             .collect()
     }

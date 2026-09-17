@@ -1,0 +1,5 @@
+error: developer_id is reserved; zero and every upper/lower-case spelling of KORG are forbidden
+  --> tests/ui/plugin-fail-reserved-developer.rs:10:20
+   |
+10 |     developer_id = 0x4B6F_5267,
+   |                    ^^^^^^^^^^^

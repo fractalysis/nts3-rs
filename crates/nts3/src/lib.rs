@@ -8,6 +8,7 @@ extern crate std;
 #[allow(dead_code)]
 mod allocator;
 mod buffer;
+mod export;
 mod parameter;
 mod plugin;
 #[doc(hidden)]
@@ -18,7 +19,7 @@ mod touch;
 
 pub use allocator::AllocationStats;
 pub use buffer::{BufferError, StereoBuffer, StereoFrame, StereoFramesMut, StereoInput};
-pub use nts3_macros::Nts3Parameters;
+pub use nts3_macros::{Nts3Parameters, plugin};
 pub use parameter::{
     Nts3Parameters, Parameter, ParameterError, Smooth, SmoothStatus, SmoothedParameter,
 };
@@ -28,9 +29,11 @@ pub use touch::{TouchEvent, TouchPhase};
 /// Implementation details used by generated code and internal fixtures.
 #[doc(hidden)]
 pub mod __private {
+    pub use crate::export::{RESOURCE_MAGIC, RESOURCE_SCHEMA_VERSION, ResourceRecord};
     pub use nts3_sys::{
-        GenericfxCurve, GenericfxParamMapping, UNUSED_MAPPING, UNUSED_PARAM, UnitParam,
-        UnitParamFormat,
+        GenericfxCurve, GenericfxParamMapping, GenericfxUnitHeader, UNIT_API_VERSION,
+        UNIT_TARGET_NTS3_KAOSS_GENERICFX, UNUSED_MAPPING, UNUSED_PARAM, UnitHeader, UnitParam,
+        UnitParamFormat, UnitRuntimeDescriptor,
     };
 
     pub trait Sealed {}

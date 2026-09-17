@@ -1,0 +1,5 @@
+error: unit name contains an invalid character; use 7-bit letters, digits, space, `-`, or `_`
+ --> tests/ui/plugin-fail-name-non-ascii.rs:9:12
+  |
+9 |     name = "Écho",
+  |            ^^^^^^

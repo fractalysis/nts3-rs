@@ -1,14 +1,14 @@
 NTS-3 C dummy / Rust pass-through comparison
 ============================================
 
-Reproducible Rust SHA-256: 8f2f70bcc64d54b394692eede58573fc3620032fff935ccd5ec44d26fdeae5a6
-Rust artifact bytes: 3648
-Rust writable PT_LOAD memory bytes: 116
+Reproducible Rust SHA-256: d598283d80da55127e86b2182504de7f29635a3866352cd70ea08c5887ed21c2
+Rust artifact bytes: 4860
+Rust writable PT_LOAD memory bytes: 212
 
 GNU size (stripped artifacts):
    text	   data	    bss	    dec	    hex	filename
    3834	    292	     60	   4186	   105a	<WORKSPACE>/target/nts3/pass-through/c-dummy/dummy_genericfx.nts3unit
-   1529	    100	      4	   1633	    661	<WORKSPACE>/target/nts3/pass-through/pass_through.nts3unit
+   2309	    100	    104	   2513	    9d1	<WORKSPACE>/target/nts3/pass-through/pass_through.nts3unit
 
 Relocations:
 -- C dummy --
@@ -55,7 +55,7 @@ PLT sections:
   [ 4] .rel.plt          REL             000009a4 0009a4 000010 08  AI  2  11  4
   [ 6] .plt              PROGBITS        00000cb0 000cb0 000030 04  AX  0   0  4
 -- Rust pass-through --
-  [ 4] .rel.plt          REL             000004a8 0004a8 000000 08  AI  2  22  4
+  [ 4] .rel.plt          REL             000004cc 0004cc 000000 08  AI  2  26  4
 
 Result: Rust has no undefined dynamic symbols, call relocations, or PLT.
 Therefore no ARM-mode PLT is reachable from its Thumb callbacks; --long-plt is unnecessary for this fixture.

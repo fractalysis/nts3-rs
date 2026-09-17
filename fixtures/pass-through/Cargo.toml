@@ -10,4 +10,4 @@ path = "src/lib.rs"
 crate-type = ["staticlib"]
 
 [dependencies]
-nts3-sys = { path = "../../crates/nts3-sys" }
+nts3 = { path = "../../crates/nts3" }

@@ -6,7 +6,6 @@ authors = ["Fraccy (ssh)"]
 publish = false
 
 [dependencies]
-# This is the public facade planned in plan/architecture.md. It does not exist yet.
 nts3 = { path = "../../crates/nts3" }
 
 # 0.21.0 is pinned because its no_std build was verified for
@@ -15,10 +14,3 @@ fundsp = { version = "=0.21.0", default-features = false }
 
 [lib]
 path = "src/lib.rs"
-
-[profile.release]
-codegen-units = 1
-lto = "fat"
-opt-level = "z"
-panic = "abort"
-strip = "symbols"

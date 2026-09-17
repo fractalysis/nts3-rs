@@ -3,8 +3,7 @@
 ## Phase 0 — Freeze inputs and reproducibility
 
 - [ ] Add a root Cargo workspace and commit lockfiles.
-- [ ] Pin a known stable Rust release supporting edition 2024 (start with
-      1.85.1) and install `thumbv7em-none-eabihf` in the derived image.
+- [ ] Pin Rust 1.98.1 and install `thumbv7em-none-eabihf` in the derived image.
 - [ ] Pin `xiashj/logue-sdk:latest` by the locally verified image digest, while
       allowing an explicit override. Record GNU compiler/linker versions.
 - [ ] Pin SDK API 2.0 sources already under `external/logue-sdk` and FunDSP

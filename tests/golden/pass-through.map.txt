@@ -1,13 +1,20 @@
 Archive member included to satisfy reference by file (symbol)
 
-<WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                              (unit_init)
+<WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                              (unit_get_param_str_value)
+<WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(compiler_builtins-045ccf93696e2384.compiler_builtins.9cb67a6131c7ea3f-cgu.396.rcgu.o)
+                              <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o) (__aeabi_memclr4)
 
 Discarded input sections
 
- .text          0x0000000000000000        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+ .text          0x0000000000000000        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
  .note.GNU-stack
-                0x0000000000000000        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+                0x0000000000000000        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+ .text          0x0000000000000000        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(compiler_builtins-045ccf93696e2384.compiler_builtins.9cb67a6131c7ea3f-cgu.396.rcgu.o)
+ .llvmbc        0x0000000000000000      0xc54 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(compiler_builtins-045ccf93696e2384.compiler_builtins.9cb67a6131c7ea3f-cgu.396.rcgu.o)
+ .llvmcmd       0x0000000000000000        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(compiler_builtins-045ccf93696e2384.compiler_builtins.9cb67a6131c7ea3f-cgu.396.rcgu.o)
+ .note.GNU-stack
+                0x0000000000000000        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(compiler_builtins-045ccf93696e2384.compiler_builtins.9cb67a6131c7ea3f-cgu.396.rcgu.o)
 
 Memory Configuration
 
@@ -21,74 +28,77 @@ LOAD <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a
                 0x0000000000000000                __stack_size = 0x0
                 0x00000000000000d4                . = SIZEOF_HEADERS
 
-.hash           0x00000000000000d4       0xbc
+.hash           0x00000000000000d4       0xc0
  *(.hash)
- .hash          0x00000000000000d4       0xbc <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+ .hash          0x00000000000000d4       0xc0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
 
-.dynsym         0x0000000000000190      0x1c0
+.dynsym         0x0000000000000194      0x1d0
  *(.dynsym)
- .dynsym        0x0000000000000190      0x1c0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+ .dynsym        0x0000000000000194      0x1d0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
 
-.dynstr         0x0000000000000350      0x158
+.dynstr         0x0000000000000364      0x167
  *(.dynstr)
- .dynstr        0x0000000000000350      0x158 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+ .dynstr        0x0000000000000364      0x167 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
 
-.rel.dyn        0x00000000000004a8        0x0
+.rel.dyn        0x00000000000004cc        0x0
  *(.rel.dyn)
- .rel.got       0x00000000000004a8        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
- .rel.iplt      0x00000000000004a8        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+ .rel.got       0x00000000000004cc        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+ .rel.iplt      0x00000000000004cc        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
 
-.rel.plt        0x00000000000004a8        0x0
+.rel.plt        0x00000000000004cc        0x0
  *(.rel.plt)
- .rel.plt       0x00000000000004a8        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+ .rel.plt       0x00000000000004cc        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
 
-.text           0x00000000000004a8       0xa5
+.text           0x00000000000004cc      0x382
  *(.text)
  *(.text.*)
- .text.unit_init
-                0x00000000000004a8       0x54 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                0x00000000000004a8                unit_init
- .text.unit_teardown
-                0x00000000000004fc        0x2 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                0x00000000000004fc                unit_teardown
- *fill*         0x00000000000004fe        0x2 
- .text.unit_reset
-                0x0000000000000500        0x2 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                0x0000000000000500                unit_reset
- *fill*         0x0000000000000502        0x2 
- .text.unit_resume
-                0x0000000000000504        0x2 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                0x0000000000000504                unit_resume
- *fill*         0x0000000000000506        0x2 
- .text.unit_suspend
-                0x0000000000000508        0x2 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                0x0000000000000508                unit_suspend
- *fill*         0x000000000000050a        0x2 
- .text.unit_render
-                0x000000000000050c       0x1e <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                0x000000000000050c                unit_render
- *fill*         0x000000000000052a        0x2 
- .text.unit_get_param_value
-                0x000000000000052c        0x4 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                0x000000000000052c                unit_get_param_value
+ .text._RNvXNtCsjPinE3EpRKm_4nts313runtime_stateNtB2_16RuntimeInitErrorINtNtCs3j8ABkEzctN_4core7convert4FromNtNtB4_9allocator10ArenaErrorE4from
+                0x00000000000004cc       0x14 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
  .text.unit_get_param_str_value
-                0x0000000000000530        0xc <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                0x0000000000000530                unit_get_param_str_value
+                0x00000000000004e0        0x8 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                0x00000000000004e0                unit_get_param_str_value
+ .text.unit_get_param_value
+                0x00000000000004e8       0x2c <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                0x00000000000004e8                unit_get_param_value
+ .text.unit_init
+                0x0000000000000514      0x140 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                0x0000000000000514                unit_init
+ .text.unit_render
+                0x0000000000000654       0x54 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                0x0000000000000654                unit_render
+ .text.unit_reset
+                0x00000000000006a8        0x6 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                0x00000000000006a8                unit_reset
+ *fill*         0x00000000000006ae        0x2
+ .text.unit_resume
+                0x00000000000006b0       0x1c <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                0x00000000000006b0                unit_resume
  .text.unit_set_param_value
-                0x000000000000053c        0x2 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                0x000000000000053c                unit_set_param_value
- *fill*         0x000000000000053e        0x2 
+                0x00000000000006cc       0x44 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                0x00000000000006cc                unit_set_param_value
  .text.unit_set_tempo
-                0x0000000000000540        0x2 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                0x0000000000000540                unit_set_tempo
- *fill*         0x0000000000000542        0x2 
+                0x0000000000000710        0x6 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                0x0000000000000710                unit_set_tempo
+ *fill*         0x0000000000000716        0x2
+ .text.unit_suspend
+                0x0000000000000718       0x1c <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                0x0000000000000718                unit_suspend
+ .text.unit_teardown
+                0x0000000000000734       0x2c <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                0x0000000000000734                unit_teardown
  .text.unit_tempo_4ppqn_tick
-                0x0000000000000544        0x2 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                0x0000000000000544                unit_tempo_4ppqn_tick
- *fill*         0x0000000000000546        0x2 
+                0x0000000000000760        0x6 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                0x0000000000000760                unit_tempo_4ppqn_tick
+ *fill*         0x0000000000000766        0x2
  .text.unit_touch_event
-                0x0000000000000548        0x2 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                0x0000000000000548                unit_touch_event
+                0x0000000000000768        0x6 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                0x0000000000000768                unit_touch_event
+ *fill*         0x000000000000076e        0x2
+ .text._RNvNtCsjPinE3EpRKm_4nts39allocator17reset_and_release
+                0x0000000000000770       0x24 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+ .text.__aeabi_memclr4
+                0x0000000000000794       0xae <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(compiler_builtins-045ccf93696e2384.compiler_builtins.9cb67a6131c7ea3f-cgu.396.rcgu.o)
+                0x0000000000000794                __aeabi_memclr4
  *(.init)
  *(.fini)
  *crtbegin.o(.ctors)
@@ -98,181 +108,207 @@ LOAD <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a
  *(.ctors)
  *(.rodata)
  *(.rodata.*)
- *fill*         0x000000000000054a        0x2 
- .rodata._ZN12pass_through12EMPTY_STRING17h2e8d439a7269ce76E
-                0x000000000000054c        0x1 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+ *fill*         0x0000000000000842        0x2
+ .rodata..Lswitch.table._RNvXNtCsjPinE3EpRKm_4nts313runtime_stateNtB2_16RuntimeInitErrorINtNtCs3j8ABkEzctN_4core7convert4FromNtNtB4_9allocator10ArenaErrorE4from
+                0x0000000000000844        0xa <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
 
-.glue_7         0x0000000000000550        0x0
- .glue_7        0x0000000000000550        0x0 linker stubs
+.glue_7         0x0000000000000850        0x0
+ .glue_7        0x0000000000000850        0x0 linker stubs
 
-.glue_7t        0x0000000000000550        0x0
- .glue_7t       0x0000000000000550        0x0 linker stubs
+.glue_7t        0x0000000000000850        0x0
+ .glue_7t       0x0000000000000850        0x0 linker stubs
 
-.vfp11_veneer   0x0000000000000550        0x0
- .vfp11_veneer  0x0000000000000550        0x0 linker stubs
+.vfp11_veneer   0x0000000000000850        0x0
+ .vfp11_veneer  0x0000000000000850        0x0 linker stubs
 
-.v4_bx          0x0000000000000550        0x0
- .v4_bx         0x0000000000000550        0x0 linker stubs
+.v4_bx          0x0000000000000850        0x0
+ .v4_bx         0x0000000000000850        0x0 linker stubs
 
-.plt            0x0000000000000550        0x0
- .plt           0x0000000000000550        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+.plt            0x0000000000000850        0x0
+ .plt           0x0000000000000850        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
 
-.iplt           0x0000000000000550        0x0
- .iplt          0x0000000000000550        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+.iplt           0x0000000000000850        0x0
+ .iplt          0x0000000000000850        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
 
-.unit_header    0x0000000000000550      0x178
-                0x0000000000000550                . = ALIGN (0x8)
+.unit_header    0x0000000000000850      0x178
+                0x0000000000000850                . = ALIGN (0x8)
  *(.unit_header)
- .unit_header   0x0000000000000550      0x178 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                0x0000000000000550                unit_header
+ .unit_header   0x0000000000000850      0x178 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                0x0000000000000850                unit_header
 
-.ARM.exidx.text.unit_init
-                0x00000000000006c8        0x8
- .ARM.exidx.text.unit_init
-                0x00000000000006c8        0x8 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+.ARM.exidx.text._RNvXNtCsjPinE3EpRKm_4nts313runtime_stateNtB2_16RuntimeInitErrorINtNtCs3j8ABkEzctN_4core7convert4FromNtNtB4_9allocator10ArenaErrorE4from
+                0x00000000000009c8        0x8
+ .ARM.exidx.text._RNvXNtCsjPinE3EpRKm_4nts313runtime_stateNtB2_16RuntimeInitErrorINtNtCs3j8ABkEzctN_4core7convert4FromNtNtB4_9allocator10ArenaErrorE4from
+                0x00000000000009c8        0x8 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
 
-.ARM.exidx.text.unit_teardown
-                0x00000000000006d0        0x0
- .ARM.exidx.text.unit_teardown
-                0x00000000000006d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                                          0x8 (size before relaxing)
-
-.ARM.exidx.text.unit_reset
-                0x00000000000006d0        0x0
- .ARM.exidx.text.unit_reset
-                0x00000000000006d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                                          0x8 (size before relaxing)
-
-.ARM.exidx.text.unit_resume
-                0x00000000000006d0        0x0
- .ARM.exidx.text.unit_resume
-                0x00000000000006d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                                          0x8 (size before relaxing)
-
-.ARM.exidx.text.unit_suspend
-                0x00000000000006d0        0x0
- .ARM.exidx.text.unit_suspend
-                0x00000000000006d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                                          0x8 (size before relaxing)
-
-.ARM.exidx.text.unit_render
-                0x00000000000006d0        0x0
- .ARM.exidx.text.unit_render
-                0x00000000000006d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+.ARM.exidx.text.unit_get_param_str_value
+                0x00000000000009d0        0x0
+ .ARM.exidx.text.unit_get_param_str_value
+                0x00000000000009d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
                                           0x8 (size before relaxing)
 
 .ARM.exidx.text.unit_get_param_value
-                0x00000000000006d0        0x0
+                0x00000000000009d0        0x0
  .ARM.exidx.text.unit_get_param_value
-                0x00000000000006d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+                0x00000000000009d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
                                           0x8 (size before relaxing)
 
-.ARM.exidx.text.unit_get_param_str_value
-                0x00000000000006d0        0x0
- .ARM.exidx.text.unit_get_param_str_value
-                0x00000000000006d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+.ARM.exidx.text.unit_init
+                0x00000000000009d0        0x0
+ .ARM.exidx.text.unit_init
+                0x00000000000009d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                                          0x8 (size before relaxing)
+
+.ARM.exidx.text.unit_render
+                0x00000000000009d0        0x0
+ .ARM.exidx.text.unit_render
+                0x00000000000009d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                                          0x8 (size before relaxing)
+
+.ARM.exidx.text.unit_reset
+                0x00000000000009d0        0x0
+ .ARM.exidx.text.unit_reset
+                0x00000000000009d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                                          0x8 (size before relaxing)
+
+.ARM.exidx.text.unit_resume
+                0x00000000000009d0        0x0
+ .ARM.exidx.text.unit_resume
+                0x00000000000009d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
                                           0x8 (size before relaxing)
 
 .ARM.exidx.text.unit_set_param_value
-                0x00000000000006d0        0x0
+                0x00000000000009d0        0x0
  .ARM.exidx.text.unit_set_param_value
-                0x00000000000006d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+                0x00000000000009d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
                                           0x8 (size before relaxing)
 
 .ARM.exidx.text.unit_set_tempo
-                0x00000000000006d0        0x0
+                0x00000000000009d0        0x0
  .ARM.exidx.text.unit_set_tempo
-                0x00000000000006d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+                0x00000000000009d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                                          0x8 (size before relaxing)
+
+.ARM.exidx.text.unit_suspend
+                0x00000000000009d0        0x0
+ .ARM.exidx.text.unit_suspend
+                0x00000000000009d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                                          0x8 (size before relaxing)
+
+.ARM.exidx.text.unit_teardown
+                0x00000000000009d0        0x0
+ .ARM.exidx.text.unit_teardown
+                0x00000000000009d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
                                           0x8 (size before relaxing)
 
 .ARM.exidx.text.unit_tempo_4ppqn_tick
-                0x00000000000006d0        0x0
+                0x00000000000009d0        0x0
  .ARM.exidx.text.unit_tempo_4ppqn_tick
-                0x00000000000006d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+                0x00000000000009d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
                                           0x8 (size before relaxing)
 
 .ARM.exidx.text.unit_touch_event
-                0x00000000000006d0        0x0
+                0x00000000000009d0        0x0
  .ARM.exidx.text.unit_touch_event
-                0x00000000000006d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+                0x00000000000009d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
                                           0x8 (size before relaxing)
 
-.gnu.version_d  0x00000000000006d0        0x0
+.ARM.exidx.text._RNvNtCsjPinE3EpRKm_4nts39allocator17reset_and_release
+                0x00000000000009d0        0x0
+ .ARM.exidx.text._RNvNtCsjPinE3EpRKm_4nts39allocator17reset_and_release
+                0x00000000000009d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                                          0x8 (size before relaxing)
+
+.nts3_resources
+                0x00000000000009d0        0xc
+ .nts3_resources
+                0x00000000000009d0        0xc <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                0x00000000000009d0                nts3_resources
+
+.gnu.version_d  0x00000000000009dc        0x0
  .gnu.version_d
-                0x00000000000006d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+                0x00000000000009dc        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
 
-.gnu.version    0x00000000000006d0        0x0
- .gnu.version   0x00000000000006d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+.gnu.version    0x00000000000009dc        0x0
+ .gnu.version   0x00000000000009dc        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
 
-.gnu.version_r  0x00000000000006d0        0x0
+.gnu.version_r  0x00000000000009dc        0x0
  .gnu.version_r
-                0x00000000000006d0        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+                0x00000000000009dc        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
 
-.preinit_array  0x00000000000006d0        0x0
-                0x00000000000006d0                . = ALIGN (0x4)
+.ARM.exidx.text.__aeabi_memclr4
+                0x00000000000009dc        0x0
+ .ARM.exidx.text.__aeabi_memclr4
+                0x00000000000009dc        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(compiler_builtins-045ccf93696e2384.compiler_builtins.9cb67a6131c7ea3f-cgu.396.rcgu.o)
+                                          0x8 (size before relaxing)
+
+.preinit_array  0x00000000000009dc        0x0
+                0x00000000000009dc                . = ALIGN (0x4)
                 [!provide]                        PROVIDE (__preinit_array_start = .)
  *(.preinit_array)
                 [!provide]                        PROVIDE (__preinit_array_end = .)
 
-.init_array     0x00000000000006d0        0x0
-                0x00000000000006d0                . = ALIGN (0x4)
+.init_array     0x00000000000009dc        0x0
+                0x00000000000009dc                . = ALIGN (0x4)
                 [!provide]                        PROVIDE (__init_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.init_array.*))
  *(.init_array)
                 [!provide]                        PROVIDE (__init_array_end = .)
 
-.dynamic        0x00000000000006d0       0x58
-                0x00000000000006d0                . = ALIGN (0x8)
+.dynamic        0x00000000000009e0       0x58
+                0x00000000000009e0                . = ALIGN (0x8)
  *(.dynamic)
- .dynamic       0x00000000000006d0       0x58 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                0x00000000000006d0                _DYNAMIC
+ .dynamic       0x00000000000009e0       0x58 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                0x00000000000009e0                _DYNAMIC
 
-.got            0x0000000000000728        0xc
+.got            0x0000000000000a38        0xc
  *(.got.plt)
- .got.plt       0x0000000000000728        0xc <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                0x0000000000000728                _GLOBAL_OFFSET_TABLE_
+ .got.plt       0x0000000000000a38        0xc <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                0x0000000000000a38                _GLOBAL_OFFSET_TABLE_
  *(.igot.plt)
- .igot.plt      0x0000000000000734        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+ .igot.plt      0x0000000000000a44        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
  *(.got)
- .got           0x0000000000000734        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+ .got           0x0000000000000a44        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
  *(.igot)
 
-.data           0x0000000000000734        0x0
-                0x0000000000000734                . = ALIGN (0x4)
-                0x0000000000000734                __data_start__ = .
+.data           0x0000000000000a44        0x0
+                0x0000000000000a44                . = ALIGN (0x4)
+                0x0000000000000a44                __data_start__ = .
  *(vtable)
  *(.data)
  *(.data.*)
- .data.rel.ro   0x0000000000000734        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                0x0000000000000734                . = ALIGN (0x4)
-                0x0000000000000734                __data_end__ = .
+ .data.rel.ro   0x0000000000000a44        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                0x0000000000000a44                . = ALIGN (0x4)
+                0x0000000000000a44                __data_end__ = .
 
-.bss            0x0000000000000734        0x0
-                0x0000000000000734                . = ALIGN (0x4)
-                0x0000000000000734                __bss_start__ = .
+.bss            0x0000000000000a44       0x64
+                0x0000000000000a44                . = ALIGN (0x4)
+                0x0000000000000a44                __bss_start__ = .
  *(.bss)
  *(.bss.*)
+ .bss..L_MergedGlobals
+                0x0000000000000a44       0x64 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
  *(COMMON)
-                0x0000000000000734                . = ALIGN (0x4)
-                0x0000000000000734                __bss_end__ = .
+                0x0000000000000aa8                . = ALIGN (0x4)
+                0x0000000000000aa8                __bss_end__ = .
 
-.dynbss         0x0000000000000734        0x0
- .dynbss        0x0000000000000734        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+.dynbss         0x0000000000000aa8        0x0
+ .dynbss        0x0000000000000aa8        0x0 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
 
-.stack          0x0000000000000740        0x4
-                0x0000000000000740                . = ALIGN (0x10)
-                0x0000000000000740                __HEAP = .
-                0x0000000000000740                _end = .
-                0x0000000000000740                end = .
-                0x0000000000000740                . = (. + __heap_size)
-                0x0000000000000740                __HEAP_END = .
-                0x0000000000000740                _stack_end = .
-                0x0000000000000740                . = (. + __stack_size)
-                0x0000000000000740                _stack_addr = .
-                0x0000000000000740                __stack = .
-                0x0000000000000740                __SP_INIT = .
-                0x0000000000000744                . = (. + 0x4)
- *fill*         0x0000000000000740        0x4 
+.stack          0x0000000000000ab0        0x4
+                0x0000000000000ab0                . = ALIGN (0x10)
+                0x0000000000000ab0                __HEAP = .
+                0x0000000000000ab0                _end = .
+                0x0000000000000ab0                end = .
+                0x0000000000000ab0                . = (. + __heap_size)
+                0x0000000000000ab0                __HEAP_END = .
+                0x0000000000000ab0                _stack_end = .
+                0x0000000000000ab0                . = (. + __stack_size)
+                0x0000000000000ab0                _stack_addr = .
+                0x0000000000000ab0                __stack = .
+                0x0000000000000ab0                __SP_INIT = .
+                0x0000000000000ab4                . = (. + 0x4)
+ *fill*         0x0000000000000ab0        0x4
 
 /DISCARD/
  *(.fini_array.* .fini_array .dtors.* .dtors)
@@ -299,32 +335,59 @@ OUTPUT(<WORKSPACE>/target/nts3/pass-through/pass_through.elf elf32-littlearm)
 LOAD linker stubs
 
 .comment        0x0000000000000000       0x2c
- .comment       0x0000000000000000       0x2c <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-                                         0xb1 (size before relaxing)
+ .comment       0x0000000000000000       0x2c <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+                                         0x2d (size before relaxing)
+ .comment       0x000000000000002c       0x2d <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(compiler_builtins-045ccf93696e2384.compiler_builtins.9cb67a6131c7ea3f-cgu.396.rcgu.o)
 
 .ARM.attributes
-                0x0000000000000000       0x43
+                0x0000000000000000       0x3f
  .ARM.attributes
-                0x0000000000000000       0x47 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+                0x0000000000000000       0x47 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+ .ARM.attributes
+                0x0000000000000047       0x3a <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(compiler_builtins-045ccf93696e2384.compiler_builtins.9cb67a6131c7ea3f-cgu.396.rcgu.o)
 
-.debug_frame    0x0000000000000000       0xd4
- .debug_frame   0x0000000000000000       0xd4 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+.debug_frame    0x0000000000000000      0x1ec
+ .debug_frame   0x0000000000000000      0x1bc <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+ .debug_frame   0x00000000000001bc       0x30 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(compiler_builtins-045ccf93696e2384.compiler_builtins.9cb67a6131c7ea3f-cgu.396.rcgu.o)
+
+.debug_abbrev   0x0000000000000000       0xb2
+ .debug_abbrev  0x0000000000000000       0xb2 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(compiler_builtins-045ccf93696e2384.compiler_builtins.9cb67a6131c7ea3f-cgu.396.rcgu.o)
+
+.debug_info     0x0000000000000000      0x1fb
+ .debug_info    0x0000000000000000      0x1fb <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(compiler_builtins-045ccf93696e2384.compiler_builtins.9cb67a6131c7ea3f-cgu.396.rcgu.o)
+
+.debug_aranges  0x0000000000000000       0x20
+ .debug_aranges
+                0x0000000000000000       0x20 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(compiler_builtins-045ccf93696e2384.compiler_builtins.9cb67a6131c7ea3f-cgu.396.rcgu.o)
+
+.debug_ranges   0x0000000000000000       0x48
+ .debug_ranges  0x0000000000000000       0x48 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(compiler_builtins-045ccf93696e2384.compiler_builtins.9cb67a6131c7ea3f-cgu.396.rcgu.o)
+
+.debug_str      0x0000000000000000      0x4ff
+ .debug_str     0x0000000000000000      0x4ff <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(compiler_builtins-045ccf93696e2384.compiler_builtins.9cb67a6131c7ea3f-cgu.396.rcgu.o)
+                                        0x565 (size before relaxing)
+
+.debug_line     0x0000000000000000      0x310
+ .debug_line    0x0000000000000000      0x310 <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(compiler_builtins-045ccf93696e2384.compiler_builtins.9cb67a6131c7ea3f-cgu.396.rcgu.o)
 
 Cross Reference Table
 
 Symbol                                            File
-_DYNAMIC                                          <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-_GLOBAL_OFFSET_TABLE_                             <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-unit_get_param_str_value                          <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-unit_get_param_value                              <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-unit_header                                       <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-unit_init                                         <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-unit_render                                       <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-unit_reset                                        <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-unit_resume                                       <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-unit_set_param_value                              <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-unit_set_tempo                                    <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-unit_suspend                                      <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-unit_teardown                                     <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-unit_tempo_4ppqn_tick                             <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
-unit_touch_event                                  <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-c723878f5df79d4b.pass_through.486db164c98cfeea-cgu.0.rcgu.o)
+_DYNAMIC                                          <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+_GLOBAL_OFFSET_TABLE_                             <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+__aeabi_memclr4                                   <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(compiler_builtins-045ccf93696e2384.compiler_builtins.9cb67a6131c7ea3f-cgu.396.rcgu.o)
+                                                  <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+nts3_resources                                    <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+unit_get_param_str_value                          <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+unit_get_param_value                              <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+unit_header                                       <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+unit_init                                         <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+unit_render                                       <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+unit_reset                                        <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+unit_resume                                       <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+unit_set_param_value                              <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+unit_set_tempo                                    <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+unit_suspend                                      <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+unit_teardown                                     <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+unit_tempo_4ppqn_tick                             <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)
+unit_touch_event                                  <WORKSPACE>/target/thumbv7em-none-eabihf/release/libpass_through.a(pass_through-17bc4f7fda3975d4.pass_through.d428330e4cb7d5b8-cgu.0.rcgu.o)

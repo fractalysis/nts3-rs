@@ -8,5 +8,6 @@ This allocation-free DSP fixture makes NTS-3 touch lifecycle state observable:
 
 Consequently a began event at `(0, 0)` remains audible on the left while an
 ended event at the same coordinates is silent. Host tests cover every phase.
-Task 07 will add generated ABI exports and a unit header; until then this is a
-host/target-checkable DSP fixture with a private temporary parameter stub.
+The public parameter derive and plugin attribute generate its metadata, runtime,
+and complete ABI adapter; the fixture contains no handwritten header, callback,
+allocator, or panic code.

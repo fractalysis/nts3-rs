@@ -19,6 +19,12 @@ pub(crate) struct TouchProbe {
 #[derive(Nts3Parameters)]
 struct ProbeParameters {}
 
+#[nts3::plugin(
+    name = "Rust Touch Probe",
+    developer_id = 0x5255_5354,
+    unit_id = 0x544F_5543,
+    sdram_bytes = 1
+)]
 impl Nts3Plugin for TouchProbe {
     type Parameters = ProbeParameters;
 

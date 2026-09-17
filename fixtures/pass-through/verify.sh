@@ -12,7 +12,7 @@ CALLBACKS=(
     unit_get_param_value unit_get_param_str_value unit_set_param_value
     unit_set_tempo unit_tempo_4ppqn_tick unit_touch_event
 )
-REQUIRED=(unit_header "${CALLBACKS[@]}")
+REQUIRED=(unit_header nts3_resources "${CALLBACKS[@]}")
 
 mkdir -p "${C_OUT}" "${GOLDEN}"
 
@@ -47,6 +47,11 @@ grep -Fq 'Version5 EABI, hard-float ABI' <<<"${header}"
 
 section_count="$(arm-none-eabi-readelf -SW "${RUST_UNIT}" | grep -c ' \.unit_header ' || true)"
 [[ "${section_count}" == 1 ]]
+resource_section_count="$(arm-none-eabi-readelf -SW "${RUST_UNIT}" | grep -c ' \.nts3_resources ' || true)"
+[[ "${resource_section_count}" == 1 ]]
+arm-none-eabi-objcopy --dump-section ".nts3_resources=${OUT}/nts3_resources.bin" "${RUST_UNIT}"
+printf 'N3RS\001\000\014\000\001\000\000\000' > "${OUT}/nts3_resources.expected.bin"
+cmp "${OUT}/nts3_resources.expected.bin" "${OUT}/nts3_resources.bin"
 
 dyn_symbols="$(arm-none-eabi-readelf --dyn-syms -W "${RUST_UNIT}")"
 for symbol in "${REQUIRED[@]}"; do
@@ -119,15 +124,19 @@ report() {
         echo
         echo '### Section sizes'
         arm-none-eabi-size -A "${input}"
-    } | sed "s#${ROOT}#<WORKSPACE>#g" > "${GOLDEN}/${stem}.readelf.txt"
+    } | sed -e "s#${ROOT}#<WORKSPACE>#g" -e 's/[[:space:]]\+$//' \
+        > "${GOLDEN}/${stem}.readelf.txt"
     arm-none-eabi-objdump -dr "${input}" \
-        | sed "s#${ROOT}#<WORKSPACE>#g" > "${GOLDEN}/${stem}.objdump.txt"
+        | sed -e "s#${ROOT}#<WORKSPACE>#g" -e 's/[[:space:]]\+$//' \
+        > "${GOLDEN}/${stem}.objdump.txt"
 }
 
 report "${RUST_UNIT}" pass-through
 report "${C_OUT}/dummy_genericfx.nts3unit" c-dummy
-sed "s#${ROOT}#<WORKSPACE>#g" "${OUT}/pass_through.map" > "${GOLDEN}/pass-through.map.txt"
-sed "s#${ROOT}#<WORKSPACE>#g" "${C_OUT}/dummy_genericfx.map" > "${GOLDEN}/c-dummy.map.txt"
+sed -e "s#${ROOT}#<WORKSPACE>#g" -e 's/[[:space:]]\+$//' \
+    "${OUT}/pass_through.map" > "${GOLDEN}/pass-through.map.txt"
+sed -e "s#${ROOT}#<WORKSPACE>#g" -e 's/[[:space:]]\+$//' \
+    "${C_OUT}/dummy_genericfx.map" > "${GOLDEN}/c-dummy.map.txt"
 
 {
     echo 'NTS-3 C dummy / Rust pass-through comparison'

@@ -1,0 +1,5 @@
+error: sdram_bytes exceeds the NTS-3 3 MiB per-runtime limit
+  --> tests/ui/plugin-fail-sdram.rs:12:19
+   |
+12 |     sdram_bytes = 3_145_729
+   |                   ^^^^^^^^^
