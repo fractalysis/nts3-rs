@@ -13,7 +13,7 @@ handoff when finished or blocked.
 | 05 Parameter core | DONE | [handoff](handoffs/05-parameter-core.md) |
 | 06 Parameter derive | DONE | [handoff](handoffs/06-parameter-derive.md) |
 | 07 Plugin export | DONE | [handoff](handoffs/07-plugin-export.md) |
-| 08 Build CLI | NOT_STARTED | — |
+| 08 Build CLI | DONE | [handoff](handoffs/08-build-cli.md) |
 | 09 Inspection and memory | NOT_STARTED | — |
 | 10 Smooth Echo | NOT_STARTED | — |
 | 11 Release validation | NOT_STARTED | — |

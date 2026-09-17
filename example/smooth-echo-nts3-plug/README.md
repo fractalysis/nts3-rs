@@ -14,9 +14,9 @@ tooling have been implemented.
 Run from the repository root in Bash (WSL2 on Windows):
 
 ```bash
-./nts3 check -p smooth-echo-nts3-plug
-./nts3 build -p smooth-echo-nts3-plug --release
-./nts3 inspect target/nts3/smooth_echo.nts3unit
+./nts3.sh check -p smooth-echo-nts3-plug
+./nts3.sh build -p smooth-echo-nts3-plug --release
+./nts3.sh inspect target/nts3/smooth_echo.nts3unit
 ./container/run.sh cargo test --workspace
 ```
 

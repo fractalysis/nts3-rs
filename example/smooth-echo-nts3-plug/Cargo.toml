@@ -13,4 +13,5 @@ nts3 = { path = "../../crates/nts3" }
 fundsp = { version = "=0.21.0", default-features = false }
 
 [lib]
+name = "smooth_echo"
 path = "src/lib.rs"

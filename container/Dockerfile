@@ -3,6 +3,11 @@
 ARG BASE_IMAGE=xiashj/logue-sdk@sha256:e4d85a16c38dc4d34b0e93cabb6378df21729688dbcd88808c84e8d41aa0c9ba
 FROM ${BASE_IMAGE}
 
+ARG BASE_IMAGE
+LABEL org.nts3.image-contract="nts3-engine-v1" \
+      org.nts3.base-image="${BASE_IMAGE}" \
+      org.nts3.rust-version="1.98.1"
+
 USER root
 
 ARG RUST_VERSION=1.98.1
@@ -43,7 +48,7 @@ RUN set -eux; \
 ENV PATH=/opt/rust/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
     CARGO_HOME=/opt/cargo
 
-RUN mkdir -p /opt/cargo && chmod 0777 /opt/cargo
+RUN mkdir -p /opt/cargo/registry /opt/cargo/git && chmod 0777 /opt/cargo /opt/cargo/registry /opt/cargo/git
 
 USER user
 WORKDIR /workspace

@@ -12,9 +12,8 @@ the container. The base can be changed only via an explicit
 ./container/run.sh ./fixtures/pass-through/build.sh
 ```
 
-Run these scripts from Bash. `container/run.sh` sets `MSYS_NO_PATHCONV=1` for
-Docker, which prevents Git Bash from rewriting `/workspace` arguments.
-Generated files are written to `target/nts3/`. The Rust build pins LLVM's
+Run these scripts from a supported Bash environment. On Windows, use WSL2 with
+Docker integration. Generated files are written to `target/nts3/`. The Rust build pins LLVM's
 `-mergefunc-use-aliases=0`: real NTS-3 testing proved that firmware silently
 rejects required callbacks when identical exported functions share an alias
 address.
