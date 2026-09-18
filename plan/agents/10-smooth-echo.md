@@ -29,8 +29,7 @@ memory reports. Run pass-through and touch-probe full builds first.
 2. Add host DSP tests for silence, impulse timing, parameter sweeps, feedback
    boundary/freeze, reset retention, finite/bounded long random runs and
    separate/in-place equivalence.
-3. Produce a reference harness/golden data from the NIH/DSP behavior and compare
-   within documented tolerance, noting FunDSP 0.15→0.21 differences.
+3. Ignore the NIH-plug version of the effect - it exists just to create the nts3-plug version.
 4. Verify descriptor/default mapping bytes: 500 ms default, 0% feedback,
    exponential X time, linear Y feedback.
 5. Verify actual two-delay allocation, alignment/transient overhead and margin

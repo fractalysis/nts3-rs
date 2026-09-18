@@ -13,8 +13,12 @@ Docker; Rust, Cargo, and GNU ARM tools run in the pinned image.
 ./nts3.sh new my-effect
 ```
 
-`build` always applies the target CPU, PIC, panic-abort, release/LTO,
-dead-section, symbol-retention, SDK linker, and strip policy. A plugin manifest
+`build` always applies the `thumbv7em-none-eabihf` VFPv4-D16 baseline, PIC,
+panic-abort, release/LTO, dead-section, symbol-retention, SDK linker, and strip
+policy. It deliberately does not pass `-C target-cpu=cortex-m7`, because LLVM
+upgrades that setting to FPv5/FP-ARMv8 while the Korg SDK specifies
+`-mfpu=fpv4-sp-d16`; artifact validation requires the matching VFPv4-D16 tag.
+A plugin manifest
 does not need a static-library crate type, linker script, build script, C file,
 or Cargo configuration. For manifests without a static-library target, tooling
 records an explicit `rustc` aggregation step before using the same proven GNU

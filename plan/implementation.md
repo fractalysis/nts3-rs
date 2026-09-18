@@ -21,8 +21,11 @@ macros.
 - [ ] `#![no_std]`, panic abort, one static instance, all callbacks, static unit
       header, no heap.
 - [ ] Compile Rust to a PIC static archive using `thumbv7em-none-eabihf` and
-      `-C target-cpu=cortex-m7 -C relocation-model=pic` with size optimization,
-      one codegen unit, fat LTO where compatible, and section GC.
+      `-C relocation-model=pic` with size optimization, one codegen unit, fat
+      LTO where compatible, and section GC. Do not add `-C target-cpu=cortex-m7`:
+      LLVM 22 upgrades that CPU to FPv5/FP-ARMv8, while the SDK explicitly uses
+      `-mfpu=fpv4-sp-d16`; the first floating-point-heavy hardware unit hard-faulted
+      under the upgraded ISA even though integer-only pass-through tests passed.
 - [ ] Final-link with Korg's GNU ARM linker/compiler and
       `platform/nts-3_kaoss/ld/unit.ld`; do not invent a second linker script
       unless a documented incompatibility requires a narrowly maintained fork.

@@ -15,3 +15,6 @@ fundsp = { version = "=0.21.0", default-features = false }
 [lib]
 name = "smooth_echo"
 path = "src/lib.rs"
+
+[dev-dependencies]
+nts3-sys = { path = "../../crates/nts3-sys" }

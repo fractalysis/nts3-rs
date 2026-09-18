@@ -7,7 +7,6 @@ publish = false
 [lib]
 name = "pass_through"
 path = "src/lib.rs"
-crate-type = ["staticlib"]
 
 [dependencies]
 nts3 = { path = "../../crates/nts3" }

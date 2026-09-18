@@ -202,8 +202,12 @@ Initialization sequence:
 2. Validate declared SDRAM budget against `sdram_avail` and the 3 MiB platform
    ceiling.
 3. Allocate one arena from `sdram_alloc`; initialize an aligned bump allocator.
-4. Construct generated parameter defaults, then `P::default()` (FunDSP allocates
-   here), initialize smoothers, and call `P::initialize`.
+4. Construct generated parameter defaults and `P::default()` directly in the
+   final `MaybeUninit<Runtime<P>>` fields (FunDSP allocates here), initialize
+   smoothers, and call `P::initialize`. Do not return a complete `Runtime<P>`
+   temporary from a constructor: hardware isolation showed that the resulting
+   640-byte `unit_init` stack frame hard-locked the NTS-3, while direct field
+   initialization reduced the callback's own frame to 192 bytes.
 5. Record allocator high-water and seal it. Any render-time allocation is a
    test failure and a target OOM fault.
 6. Publish the runtime as ready only after all steps succeed.

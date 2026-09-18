@@ -122,6 +122,7 @@ OS/ABI:                            UNIX - System V
 Type:                              DYN (Shared object file)
 Machine:                           ARM
 Version5 EABI, hard-float ABI
+  Tag_FP_arch: VFPv4-D16
 EOF
 address=3
 for symbol in unit_init unit_teardown unit_reset unit_resume unit_suspend unit_render unit_get_param_value unit_get_param_str_value unit_set_param_value unit_set_tempo unit_tempo_4ppqn_tick unit_touch_event; do
@@ -490,7 +491,8 @@ fn fake_cargo_and_gnu_tools_produce_deterministic_outputs_and_transcript() {
     assert!(transcript.contains("--crate-type=staticlib"));
     assert!(transcript.contains("--undefined=unit_header"));
     assert!(transcript.contains("--undefined=nts3_resources"));
-    assert!(transcript.contains("target-cpu=cortex-m7"));
+    assert!(transcript.contains("relocation-model=pic"));
+    assert!(!transcript.contains("target-cpu=cortex-m7"));
     let log = fs::read_to_string(&fixture.log).unwrap();
     assert!(log.contains("cargo build --locked -p fake-plugin"));
     assert!(log.contains("rustc --crate-name nts3_plugin_build"));

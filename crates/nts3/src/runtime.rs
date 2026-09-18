@@ -47,6 +47,7 @@ pub struct Runtime<P: Nts3Plugin> {
 }
 
 impl<P: Nts3Plugin> Runtime<P> {
+    #[cfg(not(target_os = "none"))]
     fn construct(context: RuntimeContext) -> Result<Self, InitError> {
         // Keep this order stable: generated parameter defaults precede plugin
         // construction, matching the framework initialization contract.
@@ -62,6 +63,60 @@ impl<P: Nts3Plugin> Runtime<P> {
         let init_context = runtime.context.init_context();
         runtime.plugin.initialize(&init_context)?;
         Ok(runtime)
+    }
+
+    /// Constructs directly in the process-global runtime slot to avoid placing
+    /// a complete plugin/runtime temporary on the NTS-3 callback stack.
+    ///
+    /// # Safety
+    /// `destination` must point to writable, properly aligned, uninitialized
+    /// storage for one `Self`. It cannot alias another live value. This method
+    /// fully initializes it on success and drops initialized fields on error.
+    unsafe fn construct_in_place(
+        destination: *mut Self,
+        context: RuntimeContext,
+    ) -> Result<(), InitError> {
+        // SAFETY: the caller supplies aligned storage for `Self`; raw field
+        // addresses do not read or create references to uninitialized memory.
+        let (plugin, parameters, stored_context) = unsafe {
+            (
+                core::ptr::addr_of_mut!((*destination).plugin),
+                core::ptr::addr_of_mut!((*destination).parameters),
+                core::ptr::addr_of_mut!((*destination).context),
+            )
+        };
+
+        // Keep the same parameter-before-plugin construction order as `construct`.
+        // SAFETY: each pointer names a distinct uninitialized field exactly once.
+        unsafe { parameters.write(P::Parameters::default()) };
+        // SAFETY: the parameter field was initialized immediately above and is
+        // exclusively owned during construction.
+        unsafe {
+            (*parameters).initialize_smoothers(context.sample_rate_hz as f32);
+            (*parameters).reset_smoothers();
+        }
+        // SAFETY: this writes the distinct plugin and context fields once.
+        unsafe {
+            plugin.write(P::default());
+            stored_context.write(context);
+        }
+
+        // SAFETY: plugin/context are initialized, exclusively owned, and remain
+        // in final storage for the complete initialization callback.
+        let initialized = unsafe {
+            let init_context = (*stored_context).init_context();
+            (*plugin).initialize(&init_context)
+        };
+        if let Err(error) = initialized {
+            // SAFETY: plugin and parameters are the only fields requiring drop;
+            // both were initialized above and readiness was never published.
+            unsafe {
+                core::ptr::drop_in_place(plugin);
+                core::ptr::drop_in_place(parameters);
+            }
+            return Err(error);
+        }
+        Ok(())
     }
 
     fn reset(&mut self) {
@@ -161,18 +216,21 @@ impl<P: Nts3Plugin> RuntimeController<P> {
         };
 
         let mut plugin_error = None;
-        let result =
-            self.state.initialize(
-                validated.hooks,
-                sdram_bytes,
-                || match Runtime::<P>::construct(validated.context) {
-                    Ok(runtime) => Ok(runtime),
-                    Err(error) => {
-                        plugin_error = Some(error);
-                        Err(RuntimeInitError::ConstructionFailed)
+        // SAFETY: `Runtime::construct_in_place` honors RuntimeState's contract:
+        // it fully initializes the destination on success and drops every
+        // initialized field before returning an error.
+        let result = unsafe {
+            self.state
+                .initialize_in_place(validated.hooks, sdram_bytes, |destination| {
+                    match Runtime::<P>::construct_in_place(destination, validated.context) {
+                        Ok(()) => Ok(()),
+                        Err(error) => {
+                            plugin_error = Some(error);
+                            Err(RuntimeInitError::ConstructionFailed)
+                        }
                     }
-                },
-            );
+                })
+        };
 
         match (result, plugin_error) {
             (Ok(()), None) => UNIT_ERR_NONE,

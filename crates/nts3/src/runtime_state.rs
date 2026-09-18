@@ -109,6 +109,52 @@ impl<T> RuntimeState<T> {
         Ok(())
     }
 
+    /// Initializes the runtime directly in its final static storage.
+    ///
+    /// # Safety
+    /// On `Ok`, `construct` must have fully initialized `destination`. On
+    /// `Err`, it must have dropped every field it initialized, leaving no value
+    /// for this state to drop. The pointer cannot escape the callback.
+    pub(crate) unsafe fn initialize_in_place(
+        &mut self,
+        hooks: UnitRuntimeHooks,
+        sdram_bytes: u32,
+        construct: impl FnOnce(*mut T) -> Result<(), RuntimeInitError>,
+    ) -> Result<(), RuntimeInitError> {
+        if self.lifecycle != LifecycleState::Uninitialized {
+            return Err(RuntimeInitError::InvalidState);
+        }
+
+        self.lifecycle = LifecycleState::Initializing;
+        if let Err(error) = allocator::activate_target(hooks, sdram_bytes) {
+            self.lifecycle = LifecycleState::Uninitialized;
+            return Err(error.into());
+        }
+
+        // SAFETY: the caller's contract requires `construct` to initialize the
+        // pointed-to storage completely on success and clean up on failure.
+        if let Err(error) = construct(self.value.as_mut_ptr()) {
+            let _ = allocator::reset_and_release();
+            self.lifecycle = LifecycleState::Uninitialized;
+            return Err(error);
+        }
+
+        let stats = match allocator::seal() {
+            Ok(stats) => stats,
+            Err(error) => {
+                // SAFETY: successful in-place construction initialized the
+                // complete value, which has not yet been published.
+                unsafe { self.value.assume_init_drop() };
+                let _ = allocator::reset_and_release();
+                self.lifecycle = LifecycleState::Uninitialized;
+                return Err(error.into());
+            }
+        };
+        self.allocation_stats = Some(stats);
+        self.lifecycle = LifecycleState::Ready;
+        Ok(())
+    }
+
     pub(crate) fn ready_mut(&mut self) -> Option<&mut T> {
         if self.lifecycle != LifecycleState::Ready {
             return None;
@@ -357,6 +403,43 @@ mod tests {
             .initialize(hooks(), 4096, AllocatingValue::new)
             .unwrap();
         runtime.teardown(|_| {}).unwrap();
+        assert_eq!(ALLOC_CALLS.load(Ordering::SeqCst), 2);
+        assert_eq!(FREE_CALLS.load(Ordering::SeqCst), 2);
+    }
+
+    #[test]
+    fn in_place_initialization_publishes_only_complete_values() {
+        let _guard = TEST_SERIAL
+            .lock()
+            .unwrap_or_else(|error| error.into_inner());
+        reset_counters();
+        let mut runtime = RuntimeState::<u32>::new();
+
+        // SAFETY: the closure writes exactly one complete u32 on success and
+        // does not retain the destination pointer.
+        unsafe {
+            runtime
+                .initialize_in_place(hooks(), 4096, |destination| {
+                    destination.write(0x1234_5678);
+                    Ok(())
+                })
+                .unwrap();
+        }
+        assert_eq!(runtime.ready_mut().copied(), Some(0x1234_5678));
+        runtime.teardown(|_| {}).unwrap();
+        assert_eq!(ALLOC_CALLS.load(Ordering::SeqCst), 1);
+        assert_eq!(FREE_CALLS.load(Ordering::SeqCst), 1);
+
+        // SAFETY: this closure initializes no storage before returning failure.
+        assert_eq!(
+            unsafe {
+                runtime.initialize_in_place(hooks(), 4096, |_| {
+                    Err(RuntimeInitError::ConstructionFailed)
+                })
+            },
+            Err(RuntimeInitError::ConstructionFailed)
+        );
+        assert!(runtime.ready_mut().is_none());
         assert_eq!(ALLOC_CALLS.load(Ordering::SeqCst), 2);
         assert_eq!(FREE_CALLS.load(Ordering::SeqCst), 2);
     }
