@@ -402,6 +402,107 @@ impl<P: Nts3Plugin> Default for ExportRuntime<P> {
     }
 }
 
+#[cfg(not(target_os = "none"))]
+pub(crate) mod host {
+    use super::*;
+    use crate::allocator::host::HostArena;
+
+    const PROBE_FRAMES: usize = 64;
+    const PROBE_ITERATIONS: u32 = 256;
+
+    /// Measurements from construction and a sealed post-initialization stress loop.
+    #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+    pub struct HostProbeReport {
+        pub plugin_bytes: u64,
+        pub parameters_bytes: u64,
+        pub runtime_bytes: u64,
+        pub budget_bytes: u32,
+        pub requested_bytes: u32,
+        pub alignment_padding_bytes: u32,
+        pub high_water_bytes: u32,
+        pub initialization_allocations: u32,
+        pub post_init_allocations: u32,
+        pub render_iterations: u32,
+    }
+
+    pub fn probe<P: Nts3Plugin>(budget: u32) -> Result<HostProbeReport, &'static str> {
+        let mut arena = HostArena::new(budget)?;
+        let context = RuntimeContext {
+            sample_rate_hz: SAMPLE_RATE_HZ,
+            maximum_frames: PROBE_FRAMES,
+            touch_area: [1024, 1024],
+            get_raw_input: None,
+        };
+        let (initialized, exercised) = arena.run_sealed(
+            || Runtime::<P>::construct(context).map_err(|_| "plugin initialization failed"),
+            |runtime| exercise(runtime),
+        )?;
+        let post_init_allocations = exercised
+            .allocations
+            .checked_sub(initialized.allocations)
+            .ok_or("allocation counter regressed")?;
+        if post_init_allocations != 0 || exercised.high_water != initialized.high_water {
+            return Err("allocation occurred after plugin initialization");
+        }
+
+        Ok(HostProbeReport {
+            plugin_bytes: core::mem::size_of::<P>() as u64,
+            parameters_bytes: core::mem::size_of::<P::Parameters>() as u64,
+            runtime_bytes: core::mem::size_of::<Runtime<P>>() as u64,
+            budget_bytes: budget,
+            requested_bytes: initialized.requested_bytes,
+            alignment_padding_bytes: initialized.alignment_padding,
+            high_water_bytes: initialized.high_water,
+            initialization_allocations: initialized.allocations,
+            post_init_allocations,
+            render_iterations: PROBE_ITERATIONS,
+        })
+    }
+
+    fn exercise<P: Nts3Plugin>(runtime: &mut Runtime<P>) {
+        let input = [0.0_f32; PROBE_FRAMES * 2];
+        let mut output = [0.0_f32; PROBE_FRAMES * 2];
+        runtime.reset();
+        runtime.suspend();
+        runtime.resume();
+        for iteration in 0..PROBE_ITERATIONS {
+            let id = (iteration % 8) as u8;
+            let value = if iteration & 1 == 0 {
+                i32::MIN
+            } else {
+                i32::MAX
+            };
+            let _ = runtime.parameters.set(id, value);
+            let _ = runtime.parameters.get(id);
+            runtime.plugin.tempo_changed(120.0 + (iteration & 7) as f32);
+            runtime.plugin.tempo_4ppqn_tick(iteration);
+            runtime.touch_event(
+                0,
+                match iteration % 5 {
+                    0 => TouchPhase::Began,
+                    1 => TouchPhase::Moved,
+                    2 => TouchPhase::Stationary,
+                    3 => TouchPhase::Ended,
+                    _ => TouchPhase::Cancelled,
+                },
+                iteration % 1024,
+                (iteration * 3) % 1024,
+            );
+            // SAFETY: the fixed arrays contain exactly `PROBE_FRAMES`
+            // interleaved stereo frames and are separate for this call.
+            unsafe {
+                runtime
+                    .render(input.as_ptr(), output.as_mut_ptr(), PROBE_FRAMES as u32)
+                    .expect("the native probe uses valid fixed audio buffers");
+            }
+        }
+        runtime.reset();
+        runtime.suspend();
+        runtime.resume();
+        runtime.teardown();
+    }
+}
+
 pub const fn uq16_16_to_f32(value: u32) -> f32 {
     (value >> 16) as f32 + (value & 0xffff) as f32 / 65_536.0
 }

@@ -18,6 +18,7 @@ Usage:
   ./nts3.sh [--local] doctor
   ./nts3.sh [--local] check -p <package>
   ./nts3.sh [--local] build -p <package> [--release] [--verbose]
+  ./nts3.sh [--local] inspect <artifact>
   ./nts3.sh [--local] new <name>
 
 The default backend is the pinned Docker image. --local is an expert mode that

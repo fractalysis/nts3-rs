@@ -9,5 +9,7 @@ name = "nts3-cli"
 path = "src/main.rs"
 
 [dependencies]
+object = { version = "0.37.3", default-features = false, features = ["elf", "read"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+sha2 = "0.10.9"

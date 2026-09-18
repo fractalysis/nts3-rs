@@ -54,6 +54,7 @@ pub use allocator::FrameworkAllocator;
 #[cfg(not(target_os = "none"))]
 pub mod host {
     pub use crate::allocator::host::HostArena;
+    pub use crate::runtime::host::{HostProbeReport, probe};
 }
 
 /// Installs the process-global target allocator and panic policy in the final

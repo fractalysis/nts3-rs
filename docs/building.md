@@ -9,6 +9,7 @@ Docker; Rust, Cargo, and GNU ARM tools run in the pinned image.
 ./nts3.sh doctor
 ./nts3.sh check -p pass-through
 ./nts3.sh build -p pass-through --release
+./nts3.sh inspect target/nts3/pass_through.nts3unit
 ./nts3.sh new my-effect
 ```
 
@@ -24,9 +25,16 @@ final-link command. For a library target named `my_effect`, outputs are:
 - `target/nts3/my_effect.map`
 - `target/nts3/my_effect.commands.txt`
 - `target/nts3/my_effect.{readelf,nm,size}.txt`
+- `target/nts3/my_effect.memory.{json,txt}`
+
+Every build finishes by running the same ELF inspector exposed by `inspect`.
+It also runs the concrete plugin's isolated native initialization probe and
+fails on ABI, relocation, load, static RAM, declared SDRAM, measured SDRAM, or
+post-initialization allocation violations. `inspect` validates an existing
+artifact without rebuilding it; native probe fields are then explicitly absent.
 
 `--verbose` echoes each recorded build command. Tool failures retain their exit
-status. Artifact and memory-policy inspection is added in the next task.
+status.
 
 ## Expert local mode
 

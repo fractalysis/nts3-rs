@@ -414,6 +414,43 @@ pub mod host {
         /// Runs a single-threaded probe. Values allocating from the arena must
         /// be dropped (or intentionally forgotten) before the closure returns.
         pub fn run(&mut self, probe: impl FnOnce()) -> Result<AllocationStats, &'static str> {
+            self.activate()?;
+            probe();
+            let result = seal().map_err(|_| "failed to seal host arena");
+            self.reset()?;
+            result
+        }
+
+        pub(crate) fn run_sealed<T>(
+            &mut self,
+            construct: impl FnOnce() -> Result<T, &'static str>,
+            exercise: impl FnOnce(&mut T),
+        ) -> Result<(AllocationStats, AllocationStats), &'static str> {
+            self.activate()?;
+            let mut value = match construct() {
+                Ok(value) => value,
+                Err(error) => {
+                    self.reset()?;
+                    return Err(error);
+                }
+            };
+            let initialized = match seal() {
+                Ok(stats) => stats,
+                Err(_) => {
+                    drop(value);
+                    self.reset()?;
+                    return Err("failed to seal host arena");
+                }
+            };
+
+            exercise(&mut value);
+            let exercised = stats().ok_or("host arena disappeared during probe")?;
+            drop(value);
+            self.reset()?;
+            Ok((initialized, exercised))
+        }
+
+        fn activate(&mut self) -> Result<(), &'static str> {
             if self.active {
                 return Err("host arena is already active");
             }
@@ -422,14 +459,13 @@ pub mod host {
             with_state(|state| state.activate(arena))
                 .map_err(|_| "another framework arena is active")?;
             self.active = true;
+            Ok(())
+        }
 
-            probe();
-
-            let result = seal().map_err(|_| "failed to seal host arena");
-            let reset = with_state(AllocatorState::take);
+        fn reset(&mut self) -> Result<(), &'static str> {
+            with_state(AllocatorState::take).map_err(|_| "failed to reset host arena")?;
             self.active = false;
-            reset.map_err(|_| "failed to reset host arena")?;
-            result
+            Ok(())
         }
     }
 

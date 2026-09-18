@@ -1,3 +1,6 @@
+mod inspector;
+
+use inspector::{ProbeReport, Provenance};
 use serde::Deserialize;
 use std::env;
 use std::ffi::{OsStr, OsString};
@@ -513,6 +516,14 @@ fn build(args: &[String]) -> Result<()> {
     )?;
     report(&output_dir, stem, &unit, &mut transcript)?;
     post_link_sanity(&output_dir, stem)?;
+    let probe = run_native_probe(&metadata, &selected, &output_dir, &mut transcript)?;
+    let inspection = inspect_to_reports(&unit, Some(probe))?;
+    if !inspection.errors.is_empty() {
+        return Err(CliError::failed(format!(
+            "artifact inspection failed: {}",
+            inspection.errors.join("; ")
+        )));
+    }
 
     let size = fs::metadata(&unit)
         .map_err(|error| CliError::failed(format!("cannot stat {}: {error}", unit.display())))?
@@ -523,11 +534,274 @@ fn build(args: &[String]) -> Result<()> {
     println!("unit: {}", unit.display());
     println!("map: {}", map.display());
     println!(
-        "report inputs: {}.{{elf,readelf.txt,nm.txt,size.txt}}",
+        "reports: {}.{{memory.json,memory.txt,elf,readelf.txt,nm.txt,size.txt}}",
         output_dir.join(stem).display()
     );
     println!("command transcript: {}", transcript_path.display());
     Ok(())
+}
+
+fn run_native_probe(
+    metadata: &Metadata,
+    selected: &SelectedPackage,
+    output_dir: &Path,
+    transcript: &mut Transcript,
+) -> Result<ProbeReport> {
+    let dependency_dir = metadata.target_directory.join("release/deps");
+    remove_matching_rlibs(&dependency_dir, &selected.lib_name)?;
+    let cargo = tool("NTS3_CARGO", "cargo");
+    let cargo_args = strings(&[
+        "rustc",
+        "--locked",
+        "-p",
+        &selected.name,
+        "--lib",
+        "--release",
+        "--",
+        "--crate-type=rlib",
+    ]);
+    run_command(
+        &cargo,
+        &cargo_args,
+        &[("CARGO_PROFILE_RELEASE_LTO", OsString::from("false"))],
+        Some(transcript),
+    )?;
+    let plugin_rlib = find_rlib(&dependency_dir, &selected.lib_name)?;
+
+    let probe_dir = output_dir.join(".probe").join(&selected.lib_name);
+    fs::create_dir_all(&probe_dir).map_err(|error| {
+        CliError::failed(format!("cannot create {}: {error}", probe_dir.display()))
+    })?;
+    let source = probe_dir.join("probe.rs");
+    let executable = probe_dir.join(if cfg!(windows) { "probe.exe" } else { "probe" });
+    fs::write(
+        &source,
+        r#"extern crate plugin;
+plugin::__nts3_one_exported_plugin_per_artifact!();
+fn main() {
+    match plugin::nts3_host_probe() {
+        Ok(value) => println!(
+            "NTS3_PROBE_V1 {} {} {} {} {} {} {} {} {} {}",
+            value.plugin_bytes,
+            value.parameters_bytes,
+            value.runtime_bytes,
+            value.budget_bytes,
+            value.requested_bytes,
+            value.alignment_padding_bytes,
+            value.high_water_bytes,
+            value.initialization_allocations,
+            value.post_init_allocations,
+            value.render_iterations,
+        ),
+        Err(error) => { eprintln!("native probe failed: {error}"); std::process::exit(1); }
+    }
+}
+"#,
+    )
+    .map_err(|error| CliError::failed(format!("cannot write native probe: {error}")))?;
+    let rustc = tool("NTS3_RUSTC", "rustc");
+    let rustc_args = vec![
+        OsString::from("--edition=2024"),
+        source.as_os_str().to_owned(),
+        OsString::from("--extern"),
+        OsString::from(format!("plugin={}", plugin_rlib.display())),
+        OsString::from("-L"),
+        OsString::from(format!("dependency={}", dependency_dir.display())),
+        OsString::from("-Cpanic=abort"),
+        OsString::from("-o"),
+        executable.as_os_str().to_owned(),
+    ];
+    run_command(&rustc, &rustc_args, &[], Some(transcript))?;
+    transcript.record(executable.as_os_str(), &[], &[])?;
+    let output = Command::new(&executable).output().map_err(|error| {
+        CliError::failed(format!(
+            "failed to launch native initialization probe: {error}"
+        ))
+    })?;
+    if !output.status.success() {
+        return Err(CliError {
+            code: status_code(output.status),
+            message: format!(
+                "native initialization probe failed: {}",
+                String::from_utf8_lossy(&output.stderr).trim()
+            ),
+        });
+    }
+    parse_probe_output(&String::from_utf8_lossy(&output.stdout))
+}
+
+fn parse_probe_output(output: &str) -> Result<ProbeReport> {
+    let line = output
+        .lines()
+        .find(|line| line.starts_with("NTS3_PROBE_V1 "))
+        .ok_or_else(|| CliError::failed("native probe produced no NTS3_PROBE_V1 record"))?;
+    let values = line
+        .split_whitespace()
+        .skip(1)
+        .map(|value| {
+            value.parse::<u64>().map_err(|_| {
+                CliError::failed(format!("native probe produced invalid integer `{value}`"))
+            })
+        })
+        .collect::<Result<Vec<_>>>()?;
+    if values.len() != 10 {
+        return Err(CliError::failed(format!(
+            "native probe produced {} fields, expected 10",
+            values.len()
+        )));
+    }
+    Ok(ProbeReport {
+        plugin_bytes: values[0],
+        parameters_bytes: values[1],
+        runtime_bytes: values[2],
+        budget_bytes: values[3],
+        requested_bytes: values[4],
+        alignment_padding_bytes: values[5],
+        high_water_bytes: values[6],
+        initialization_allocations: values[7],
+        post_init_allocations: values[8],
+        render_iterations: values[9],
+    })
+}
+
+fn inspect_to_reports(
+    path: &Path,
+    probe: Option<ProbeReport>,
+) -> Result<inspector::InspectionReport> {
+    let report = inspector::inspect(path, probe, provenance())
+        .map_err(|error| CliError::failed(format!("inspection failed: {error}")))?;
+    let (json_path, text_path) = inspector::report_paths(path);
+    inspector::write_reports(&report, &json_path, &text_path).map_err(CliError::failed)?;
+    println!("memory report: {}", text_path.display());
+    println!("memory JSON: {}", json_path.display());
+    Ok(report)
+}
+
+fn inspect_command(args: &[String]) -> Result<()> {
+    if args.len() != 1 {
+        return Err(CliError::usage("usage: nts3 inspect <artifact>"));
+    }
+    let path = PathBuf::from(&args[0]);
+    let report = inspect_to_reports(&path, cached_probe(&path))?;
+    print!("{}", inspector::human_report(&report));
+    if report.errors.is_empty() {
+        Ok(())
+    } else {
+        Err(CliError::failed(format!(
+            "artifact rejected: {}",
+            report.errors.join("; ")
+        )))
+    }
+}
+
+#[derive(Deserialize)]
+struct CachedInspection {
+    artifact: CachedArtifact,
+    native_probe: Option<ProbeReport>,
+}
+
+#[derive(Deserialize)]
+struct CachedArtifact {
+    sha256: String,
+}
+
+fn cached_probe(path: &Path) -> Option<ProbeReport> {
+    use sha2::{Digest, Sha256};
+    let (json_path, _) = inspector::report_paths(path);
+    let cached: CachedInspection = serde_json::from_slice(&fs::read(json_path).ok()?).ok()?;
+    let actual = format!("{:x}", Sha256::digest(fs::read(path).ok()?));
+    (cached.artifact.sha256 == actual)
+        .then_some(cached.native_probe)
+        .flatten()
+}
+
+fn provenance() -> Provenance {
+    Provenance {
+        rust: command_line("rustc", &["--version"]),
+        cargo: command_line("cargo", &["--version"]),
+        gnu_arm_gcc: command_line("arm-none-eabi-gcc", &["--version"]),
+        gnu_binutils: command_line("arm-none-eabi-readelf", &["--version"]),
+        sdk_commit: source_revision(Path::new("external/logue-sdk")),
+        framework_commit: source_revision(Path::new(".")),
+        framework_version: env!("CARGO_PKG_VERSION").to_owned(),
+        fundsp_version: locked_package_version("fundsp").unwrap_or_else(|| "not present".to_owned()),
+        container_base_image: "xiashj/logue-sdk@sha256:e4d85a16c38dc4d34b0e93cabb6378df21729688dbcd88808c84e8d41aa0c9ba".to_owned(),
+        cargo_lock_sha256: file_sha256(Path::new("Cargo.lock")),
+        sdk_linker_script_sha256: file_sha256(Path::new(
+            "external/logue-sdk/platform/nts-3_kaoss/ld/unit.ld",
+        )),
+    }
+}
+
+fn source_revision(root: &Path) -> String {
+    let git_marker = root.join(".git");
+    let git_dir = if git_marker.is_dir() {
+        git_marker
+    } else if let Ok(marker) = fs::read_to_string(&git_marker) {
+        let Some(relative) = marker.trim().strip_prefix("gitdir: ") else {
+            return "unknown".to_owned();
+        };
+        root.join(relative)
+    } else {
+        return "unknown".to_owned();
+    };
+    let Ok(head) = fs::read_to_string(git_dir.join("HEAD")) else {
+        return "unknown".to_owned();
+    };
+    let head = head.trim();
+    let Some(reference) = head.strip_prefix("ref: ") else {
+        return head.to_owned();
+    };
+    if let Ok(value) = fs::read_to_string(git_dir.join(reference)) {
+        return value.trim().to_owned();
+    }
+    fs::read_to_string(git_dir.join("packed-refs"))
+        .ok()
+        .and_then(|contents| {
+            contents.lines().find_map(|line| {
+                let (hash, name) = line.split_once(' ')?;
+                (name == reference).then(|| hash.to_owned())
+            })
+        })
+        .unwrap_or_else(|| "unknown".to_owned())
+}
+
+fn file_sha256(path: &Path) -> String {
+    use sha2::{Digest, Sha256};
+    fs::read(path)
+        .map(|bytes| format!("{:x}", Sha256::digest(bytes)))
+        .unwrap_or_else(|_| "unknown".to_owned())
+}
+
+fn command_line(program: &str, args: &[&str]) -> String {
+    Command::new(program)
+        .args(args)
+        .output()
+        .ok()
+        .filter(|output| output.status.success())
+        .map(|output| {
+            String::from_utf8_lossy(&output.stdout)
+                .lines()
+                .next()
+                .unwrap_or("")
+                .trim()
+                .to_owned()
+        })
+        .filter(|value| !value.is_empty())
+        .unwrap_or_else(|| "unknown".to_owned())
+}
+
+fn locked_package_version(name: &str) -> Option<String> {
+    let contents = fs::read_to_string("Cargo.lock").ok()?;
+    let marker = format!("name = \"{name}\"\n");
+    let rest = contents.split(&marker).nth(1)?;
+    let version = rest.lines().find(|line| line.starts_with("version = \""))?;
+    Some(
+        version
+            .trim_start_matches("version = \"")
+            .trim_end_matches('"')
+            .to_owned(),
+    )
 }
 
 fn post_link_sanity(output_dir: &Path, stem: &str) -> Result<()> {
@@ -902,7 +1176,7 @@ fn strings(values: &[&str]) -> Vec<OsString> {
 
 fn usage() {
     eprintln!(
-        "Usage:\n  ./nts3.sh doctor\n  ./nts3.sh check -p <package>\n  ./nts3.sh build -p <package> [--release] [--verbose]\n  ./nts3.sh new <name>"
+        "Usage:\n  ./nts3.sh doctor\n  ./nts3.sh check -p <package>\n  ./nts3.sh build -p <package> [--release] [--verbose]\n  ./nts3.sh inspect <artifact>\n  ./nts3.sh new <name>"
     );
 }
 
@@ -917,9 +1191,7 @@ fn run() -> Result<()> {
         "check" => check(&rest),
         "build" => build(&rest),
         "new" => new_plugin(&rest),
-        "inspect" => Err(CliError::usage(
-            "inspect is reserved for the artifact-inspection task and is not available yet",
-        )),
+        "inspect" => inspect_command(&rest),
         "-h" | "--help" | "help" => {
             usage();
             Ok(())
@@ -956,5 +1228,17 @@ mod tests {
         for invalid in ["", "Smooth", "a_b", "-a", "a-", "a--b"] {
             assert!(!valid_package_name(invalid), "{invalid}");
         }
+    }
+
+    #[test]
+    fn native_probe_record_is_versioned_and_exact() {
+        let probe = parse_probe_output("noise\nNTS3_PROBE_V1 1 2 3 4 5 6 7 8 0 256\n").unwrap();
+        assert_eq!(probe.plugin_bytes, 1);
+        assert_eq!(probe.parameters_bytes, 2);
+        assert_eq!(probe.runtime_bytes, 3);
+        assert_eq!(probe.high_water_bytes, 7);
+        assert_eq!(probe.post_init_allocations, 0);
+        assert_eq!(probe.render_iterations, 256);
+        assert!(parse_probe_output("NTS3_PROBE_V2 1").is_err());
     }
 }

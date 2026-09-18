@@ -180,7 +180,13 @@ fn expand_plugin(
         // diagnostic before an artifact with ambiguous exports can be built.
         #[doc(hidden)]
         #[macro_export]
-        macro_rules! __nts3_one_exported_plugin_per_artifact { () => {}; }
+        macro_rules! __nts3_one_exported_plugin_per_artifact {
+            () => {
+                #[global_allocator]
+                static __NTS3_HOST_PROBE_ALLOCATOR: $crate::__Nts3HostProbeAllocator =
+                    $crate::__Nts3HostProbeAllocator;
+            };
+        }
 
         ::nts3::__install_runtime_glue!();
 
@@ -210,6 +216,18 @@ fn expand_plugin(
         #[unsafe(link_section = ".nts3_resources")]
         pub static nts3_resources: ::nts3::__private::ResourceRecord =
             ::nts3::__private::ResourceRecord::new(#sdram_bytes);
+
+        /// Runs the framework's native, arena-isolated initialization and
+        /// post-initialization allocation probe for this concrete plugin.
+        #[cfg(not(target_os = "none"))]
+        #[doc(hidden)]
+        pub fn nts3_host_probe() -> Result<::nts3::host::HostProbeReport, &'static str> {
+            ::nts3::host::probe::<#self_type>(#sdram_bytes)
+        }
+
+        #[cfg(not(target_os = "none"))]
+        #[doc(hidden)]
+        pub use ::nts3::FrameworkAllocator as __Nts3HostProbeAllocator;
 
         #[doc(hidden)]
         static __NTS3_RUNTIME: ::nts3::runtime::ExportRuntime<#self_type> =
