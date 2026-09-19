@@ -15,5 +15,5 @@ handoff when finished or blocked.
 | 07 Plugin export | DONE | [handoff](handoffs/07-plugin-export.md) |
 | 08 Build CLI | DONE | [handoff](handoffs/08-build-cli.md) |
 | 09 Inspection and memory | DONE | [handoff](handoffs/09-inspection-memory.md) |
-| 10 Smooth Echo | BLOCKED | [handoff](handoffs/10-smooth-echo.md): all component probes pass; 448-byte init-stack reduction awaits hardware retest |
+| 10 Smooth Echo | DONE | [handoff](handoffs/10-smooth-echo.md) |
 | 11 Release validation | NOT_STARTED | — |

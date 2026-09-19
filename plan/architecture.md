@@ -207,7 +207,9 @@ Initialization sequence:
    smoothers, and call `P::initialize`. Do not return a complete `Runtime<P>`
    temporary from a constructor: hardware isolation showed that the resulting
    640-byte `unit_init` stack frame hard-locked the NTS-3, while direct field
-   initialization reduced the callback's own frame to 192 bytes.
+   initialization reduced the callback's own frame to 192 bytes. Controlled
+   pass-through fixtures subsequently established 624 bytes as the largest
+   working exported-callback own frame and 632 bytes as failing.
 5. Record allocator high-water and seal it. Any render-time allocation is a
    test failure and a target OOM fault.
 6. Publish the runtime as ready only after all steps succeed.

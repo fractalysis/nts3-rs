@@ -445,6 +445,7 @@ version = "0.1.0"
 dependencies = [
  "fundsp",
  "nts3",
+ "nts3-sys",
 ]
 
 [[package]]

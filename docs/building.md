@@ -28,7 +28,8 @@ final-link command. For a library target named `my_effect`, outputs are:
 - `target/nts3/my_effect.elf`
 - `target/nts3/my_effect.map`
 - `target/nts3/my_effect.commands.txt`
-- `target/nts3/my_effect.{readelf,nm,size}.txt`
+- `target/nts3/my_effect.{readelf,nm,size,objdump}.txt`
+- `target/nts3/my_effect.stack.txt`
 - `target/nts3/my_effect.memory.{json,txt}`
 
 Every build finishes by running the same ELF inspector exposed by `inspect`.

@@ -23,6 +23,11 @@ The named `nts3-framework-v1` policy enforces:
 - zero successful allocations through 256 post-initialization render and
   lifecycle/event stress iterations.
 
+`build` and standalone `inspect` disassemble every exported callback and reject
+an own machine-code stack frame above 624 bytes. Controlled pass-through units
+that differed only in forced `unit_init` frame size established the boundary on
+the tested NTS-3: 624 bytes works and 632 bytes hard-locks the device.
+
 The official Korg C dummy predates `.nts3_resources` and uses local C++
 relocations and PLT entries known to be accepted by the loader. It is inspected
 under the explicit `korg-sdk-legacy-v1` comparison policy. That policy still
@@ -50,7 +55,19 @@ model. Framework builds never use this exception.
   go to the system allocator.
 - **Plugin/Parameters/Runtime sizes**: native `size_of` measurements. They are
   useful structural diagnostics, not target SDRAM usage.
+- **Callback own-frame stack**: `build` and `inspect` disassemble every exported
+  callback, write `<unit>.stack.txt`, and reject any own frame above 624 bytes.
+  This catches the empirically demonstrated callback-frame failure before use.
 
-Worst-case stack and NTS-3 real-time CPU are always `unknown` until measured on
-hardware. The linker script's four-byte `.stack` sentinel is static load
-metadata, not a stack watermark and never justifies reporting zero usage.
+The checked-in NTS-3 SDK does **not** publish the firmware callback-thread stack
+size. Its `unit.ld` sets `__stack_size = 0` because a unit uses a firmware-owned
+stack rather than reserving a private one; that is not a zero-byte limit. The
+4,096-byte arrays in NTS-3 `wasm.cc` files belong to the browser simulator's
+WebAudio worker and are not hardware specifications.
+
+The 624-byte limit applies to an exported callback's own frame on the tested
+firmware/device, not to a documented total stack allocation. Worst-case
+transitive stack and NTS-3 real-time CPU remain `unknown`. The callback report
+does not include firmware caller usage, nested callees, recursion, interrupts,
+or a hardware watermark. The linker script's four-byte `.stack` sentinel is
+static load metadata and never justifies reporting zero usage.

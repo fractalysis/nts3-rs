@@ -129,6 +129,18 @@ for symbol in unit_init unit_teardown unit_reset unit_resume unit_suspend unit_r
   printf '1: %08x 4 FUNC GLOBAL DEFAULT 1 %s\n' "$address" "$symbol"
   address=$((address + 2))
 done
+elif [[ "$1" == -d ]]; then
+address=1000
+for symbol in unit_init unit_teardown unit_reset unit_resume unit_suspend unit_render unit_get_param_value unit_get_param_str_value unit_set_param_value unit_set_tempo unit_tempo_4ppqn_tick unit_touch_event; do
+  printf '%08x <%s>:\n' "$address" "$symbol"
+  printf ' %x: b580       push {r7, lr}\n' "$address"
+  if [[ "$symbol" == unit_init && -n "${FAKE_STACK_LOCAL_BYTES:-}" ]]; then
+    printf ' %x: f5ad 7d00  sub.w sp, sp, #%s\n' "$((address + 2))" "${FAKE_STACK_LOCAL_BYTES}"
+    printf ' %x: f50d 7d00  add.w sp, sp, #%s\n' "$((address + 6))" "${FAKE_STACK_LOCAL_BYTES}"
+  fi
+  printf ' %x: bd80       pop {r7, pc}\n' "$((address + 10))"
+  address=$((address + 12))
+done
 elif [[ "$1" == -D ]]; then
 address=1
 for symbol in unit_header unit_init unit_teardown unit_reset unit_resume unit_suspend unit_render unit_get_param_value unit_get_param_str_value unit_set_param_value unit_set_tempo unit_tempo_4ppqn_tick unit_touch_event nts3_resources; do
@@ -163,6 +175,7 @@ fi
             .env("NTS3_READELF", self.bin.join("report"))
             .env("NTS3_NM", self.bin.join("report"))
             .env("NTS3_SIZE", self.bin.join("report"))
+            .env("NTS3_OBJDUMP", self.bin.join("report"))
             .env("FAKE_METADATA", &self.metadata)
             .env("FAKE_ARCHIVE", &self.archive)
             .env("FAKE_RLIB", &self.rlib)
@@ -482,6 +495,8 @@ fn fake_cargo_and_gnu_tools_produce_deterministic_outputs_and_transcript() {
         "nm.txt",
         "size.txt",
         "commands.txt",
+        "objdump.txt",
+        "stack.txt",
         "memory.json",
         "memory.txt",
     ] {
@@ -497,6 +512,22 @@ fn fake_cargo_and_gnu_tools_produce_deterministic_outputs_and_transcript() {
     assert!(log.contains("cargo build --locked -p fake-plugin"));
     assert!(log.contains("rustc --crate-name nts3_plugin_build"));
     assert!(log.contains("gcc "));
+}
+
+#[test]
+fn standalone_inspect_rejects_callback_frame_above_hardware_limit() {
+    let fixture = Fixture::new();
+    let output = fixture
+        .command()
+        // Eight pushed bytes plus 624 local bytes gives a 632-byte own frame.
+        .env("FAKE_STACK_LOCAL_BYTES", "624")
+        .args(["inspect", fixture.valid_elf.to_str().unwrap()])
+        .output()
+        .unwrap();
+    assert!(!output.status.success());
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("`unit_init` own frame is 632 bytes"));
+    assert!(stderr.contains("624-byte NTS-3 limit"));
 }
 
 #[test]

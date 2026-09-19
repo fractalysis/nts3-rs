@@ -2,8 +2,12 @@
 
 ## Status
 
-**BLOCKED: hardware hard fault under investigation.** The first Smooth Echo
-artifact installed successfully but selecting it completely locked the NTS-3;
+**DONE.** The final in-place-construction Smooth Echo artifact with SHA-256
+`3c3c42cc3d1ebcd30528f714947dd7972e42b7fae17dc6c7bb3c6a9add21bd90`
+works perfectly on the user's NTS-3. All source, host DSP, target, packaging,
+inspection, allocation, memory, callback-frame, and hardware gates pass.
+
+The first Smooth Echo artifact installed successfully but selecting it completely locked the NTS-3;
 even the power button stopped responding until physical power was disconnected.
 The failing hash was
 `0f18f7a082959b5da20de7ef043ea5268ab24705177abd7d5713b67e1e1cd1d6`.
@@ -59,8 +63,8 @@ It contains the same combined initialization and reduced stack frame but still
 renders pass-through. Test this first. The resulting full-DSP candidate is
 `target/nts3/smooth_echo.nts3unit`, SHA-256
 `3c3c42cc3d1ebcd30528f714947dd7972e42b7fae17dc6c7bb3c6a9add21bd90`.
-All host DSP, target, allocation, and inspector checks pass; hardware selection
-is pending.
+All host DSP, target, allocation, and inspector checks pass. The user confirmed
+that the final full-DSP artifact works perfectly on hardware.
 
 ## Summary and design decisions
 
@@ -98,6 +102,11 @@ is pending.
 - Corrected a hardware-discovered toolchain flaw: `target-cpu=cortex-m7` selected
   LLVM FPv5/FP-ARMv8 instead of the SDK's VFPv4-D16 baseline. The CLI no longer
   supplies that upgrade and now checks the GNU readelf FP architecture tag.
+- Added callback-own-frame validation to both build and standalone inspection.
+  GNU objdump output is measured for all 12 exports, `<unit>.stack.txt` is
+  emitted, and any own frame above 624 bytes fails. Controlled otherwise-identical
+  pass-through artifacts established the tested boundary: 624 bytes works and
+  632 bytes hard-locks the NTS-3. The SDK itself publishes no numeric stack size.
 - Removed the pass-through fixture's historical `crate-type = ["staticlib"]` so
   it uses the same no-boilerplate archive route as all other plugins; this also
   keeps its native probe reliable after a clean build.
@@ -109,12 +118,16 @@ is pending.
 - Added `example/smooth-echo-nts3-plug/tests/dsp.rs`.
 - Changed `example/smooth-echo-nts3-plug/Cargo.toml` to add the test-only local
   `nts3-sys` dependency.
-- Updated `Cargo.lock` for the test dependency and diagnostic fixture.
-- Added `fixtures/smooth-echo-{init,arena,vec,params,filter,tap}-probe/`
-  with workspace entries to isolate render, arena reservation, arena-backed
-  writes, parameters/libm, filters, and taps on hardware.
+- Updated `Cargo.lock` for the Smooth Echo test dependency.
+- Temporarily added Smooth Echo component probes and exact callback-frame
+  boundary fixtures, then removed every diagnostic package and workspace entry
+  after hardware isolation. Their tested outcomes remain recorded as provenance.
 - Changed `crates/nts3-cli/src/main.rs` and
-  `crates/nts3-cli/tests/fake_tools.rs` to enforce the SDK VFPv4-D16 baseline.
+  `crates/nts3-cli/tests/fake_tools.rs` to enforce the SDK VFPv4-D16 baseline
+  and callback own-frame stack policy.
+- Changed `docs/building.md` and `docs/memory.md` to document the 624-byte
+  build/inspect gate, its exact 624-pass/632-fail hardware evidence, report
+  semantics, and the absence of an SDK-published total stack size.
 - Changed `crates/nts3/src/runtime.rs` and `runtime_state.rs` to construct the
   concrete runtime directly in final static storage and test publication/error
   cleanup without a full-runtime stack temporary.
@@ -192,9 +205,11 @@ Generated files are gitignored under `target/nts3/`:
 | `smooth_echo.nts3unit` | `3c3c42cc3d1ebcd30528f714947dd7972e42b7fae17dc6c7bb3c6a9add21bd90` |
 | `smooth_echo.elf` | `a18702df75f73f23a86c528e7c752a5095ff69d34b2992a764c4562fe201d1b9` |
 | `smooth_echo.map` | `e63df2ac72da7d40899d656abb59a5d3fc14bec49aa453b004930254a4571e9d` |
-| `smooth_echo.memory.json` | `c0a604ecf3b1471088615d2c53107d0bd467cd7564184e91fa6c43a6a895f0be` |
-| `smooth_echo.memory.txt` | `6ed9831d2dfae0e063af3630c54f6564746e08a016c227431e885a09c2ef679a` |
-| `smooth_echo.commands.txt` | `e1cfc1b7cce71cbf31dab8c0bc4f05a006e1aef840ec8cd45c37c19aeb7613cc` |
+| `smooth_echo.memory.json` | `b3c47ae7d67dc50267f94376ab43198254aac4a4d8044a46d15fbc0f17490109` |
+| `smooth_echo.memory.txt` | `5cb2ef5498dac0dbd0a45181fbb94dd89d61483f548202e5aa85bb4a2aa36d53` |
+| `smooth_echo.commands.txt` | `3fe124e80ef208197c76a7033f86dbe9a8d7235676c105b1c9ee73ad855f2d23` |
+| `smooth_echo.objdump.txt` | `25c154a67eb150b4cf8814ae48a97e97b8aa882c2ed12f02a649b5cf3cbb8aab` |
+| `smooth_echo.stack.txt` | `6d85f6b3e9cec28ba2764aa095207d45ff6a38981b670c827c5e8f1204de59d8` |
 
 The exact release compile, archive aggregation, GNU final link, strip, report,
 and native-probe commands are in
@@ -218,30 +233,24 @@ and native-probe commands are in
   symbol/PLT/relocation/debug/unwind condition.
 - Worst-case stack and NTS-3 real-time CPU remain unknown, as stated in reports.
 
-## Hardware blocker
+## Hardware result
 
-The original FPv5 Smooth Echo, corrected VFPv4-D16 Smooth Echo, and exact
-pass-through-rendering FunDSP initialization probe all hard-faulted immediately
-when selected. All six narrower component probes work, isolating the combined
-initialization stack footprint. Test the in-place-construction full Smooth Echo
-candidate next. After selection succeeds, the final hardware checks remain:
+The original FPv5 Smooth Echo, corrected VFPv4-D16 Smooth Echo, and original
+pass-through-rendering combined initialization probe all hard-faulted immediately
+when selected. All six narrower component probes worked, isolating the combined
+initialization stack footprint. After direct in-place runtime construction
+reduced `unit_init` from 640 to 192 own-frame bytes, the user reported that the
+final full-DSP artifact works perfectly. Temporary probe sources were removed.
 
-- X range/curve and Y feedback behavior; defaults 500 ms / 0%;
-- rapid X smoothing;
-- near-unity freeze, release, reset, suspend, and resume;
-- sustained stereo full-scale and silence for clipping/noise/dropouts/channels;
-- four simultaneous copies with different settings;
-- unload/reload and arena return;
-- firmware version and observed CPU/dropout behavior.
+Follow-up controlled pass-through tests found that callback own frames through
+624 bytes work, while 632 and 640 bytes hard-lock the device. Build and standalone
+inspection now reject exported callback own frames above 624 bytes. The SDK
+still provides no firmware total-stack number, and transitive callee, firmware
+caller, interrupt headroom, and quantitative CPU usage remain unknown.
 
-No software or ELF test can convert this to a hardware pass. Stack and CPU are
-also not statically proven.
+## Next task prerequisite smoke commands
 
-## Next step
-
-Load `target/nts3/smooth_echo.nts3unit` with the hash above and report the
-hardware matrix, or explicitly waive hardware validation. Once resolved, mark
-Task 10 DONE and Task 11 may start with:
+Task 11 may start with:
 
 ```bash
 MSYS_NO_PATHCONV=1 ./nts3.sh build -p pass-through --release

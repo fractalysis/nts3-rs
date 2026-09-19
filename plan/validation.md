@@ -118,11 +118,15 @@ memory JSON as CI artifacts.
 
 ### Stack and CPU
 
-ELF inspection does not prove worst-case stack or real-time CPU. If supported,
-add stack-size metadata; otherwise mark unknown. On hardware use a stack
-watermark only if memory ownership/API make that safe. Record audio dropout/CPU
-stress results at the maximum runtime buffer and with four simultaneous unit
-instances.
+Build and standalone inspection disassemble every exported callback, emit
+`<unit>.stack.txt`, and reject an own frame above 624 bytes. Controlled
+pass-through artifacts established that exact boundary on the tested hardware:
+624 bytes works and 632 bytes hard-locks. The SDK publishes no firmware
+callback-stack size, so transitive callee/caller/interrupt worst case remains
+unknown despite this callback-own-frame gate. ELF inspection also does not prove real-time CPU. On
+hardware use a stack watermark only if memory ownership/API make that safe.
+Record audio dropout/CPU stress results at the maximum runtime buffer and with
+four simultaneous unit instances.
 
 ## 6. DSP tests
 

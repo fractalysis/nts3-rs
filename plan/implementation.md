@@ -179,8 +179,11 @@ Generate `<unit>.memory.txt` and `<unit>.memory.json` containing:
       probe.
 - [ ] Declared target SDRAM arena from `.nts3_resources`.
 - [ ] Native initialization allocator high-water, margin and percent of 3 MiB.
-- [ ] Stack usage as `unknown` unless measured; never report it as zero merely
-      because the linker script reserves zero private stack.
+- [ ] Keep worst-case transitive stack `unknown` unless measured; never report
+      it as zero merely because the linker script reserves zero private stack.
+      Separately disassemble exported callbacks, emit an own-frame report, and
+      fail frames above the empirically tested 624-byte limit (624 works; 632
+      hard-locks the tested NTS-3).
 - [ ] Toolchain/framework/SDK/FunDSP versions and source commit IDs.
 
 Validation must also reject:

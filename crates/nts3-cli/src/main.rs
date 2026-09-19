@@ -1,6 +1,7 @@
 mod inspector;
 
 use inspector::{ProbeReport, Provenance};
+use object::{Object, ObjectSymbol};
 use serde::Deserialize;
 use std::env;
 use std::ffi::{OsStr, OsString};
@@ -13,6 +14,11 @@ const TARGET: &str = "thumbv7em-none-eabihf";
 const RUST_VERSION: &str = "1.98.1";
 const GCC_VERSION: &str = "9.2.1 20191025";
 const BINUTILS_VERSION: &str = "2.34";
+// The SDK does not publish the firmware callback-thread stack size. Controlled,
+// otherwise-identical pass-through artifacts established that a 624-byte
+// unit_init own frame works and a 632-byte frame hard-locks the NTS-3. Enforce
+// the largest observed-safe callback own frame for this firmware/device family.
+const CALLBACK_FRAME_LIMIT_BYTES: u64 = 624;
 const EXPORTS: &[&str] = &[
     "unit_header",
     "unit_init",
@@ -154,8 +160,10 @@ fn tool(variable: &str, default: &str) -> OsString {
 
 fn rust_env(workspace_root: &Path, release: bool) -> Vec<(&'static str, OsString)> {
     let flags = [
-        "-C".to_owned(),
-        "target-cpu=cortex-m7".to_owned(),
+        // The `thumbv7em-none-eabihf` target already matches the SDK's
+        // VFPv4-D16 hard-float baseline. Do not select `cortex-m7` here: LLVM
+        // then upgrades codegen to FPv5/FP-ARMv8, which passed integer-only
+        // fixtures but hard-faulted the first floating-point-heavy NTS-3 unit.
         "-C".to_owned(),
         "relocation-model=pic".to_owned(),
         "-C".to_owned(),
@@ -436,7 +444,6 @@ fn build(args: &[String]) -> Result<()> {
             OsString::from("-Ccodegen-units=1"),
             OsString::from("-Clto=fat"),
             OsString::from("-Cpanic=abort"),
-            OsString::from("-Ctarget-cpu=cortex-m7"),
             OsString::from("-Crelocation-model=pic"),
             OsString::from("-Cforce-unwind-tables=no"),
             OsString::from("-Cllvm-args=-mergefunc-use-aliases=0"),
@@ -514,8 +521,9 @@ fn build(args: &[String]) -> Result<()> {
         &[],
         Some(&mut transcript),
     )?;
-    report(&output_dir, stem, &unit, &mut transcript)?;
+    report(&output_dir, stem, &unit, &elf, &mut transcript)?;
     post_link_sanity(&output_dir, stem)?;
+    validate_callback_stack(&output_dir, stem)?;
     let probe = run_native_probe(&metadata, &selected, &output_dir, &mut transcript)?;
     let inspection = inspect_to_reports(&unit, Some(probe))?;
     if !inspection.errors.is_empty() {
@@ -534,7 +542,7 @@ fn build(args: &[String]) -> Result<()> {
     println!("unit: {}", unit.display());
     println!("map: {}", map.display());
     println!(
-        "reports: {}.{{memory.json,memory.txt,elf,readelf.txt,nm.txt,size.txt}}",
+        "reports: {}.{{memory.json,memory.txt,elf,readelf.txt,nm.txt,size.txt,objdump.txt,stack.txt}}",
         output_dir.join(stem).display()
     );
     println!("command transcript: {}", transcript_path.display());
@@ -682,6 +690,7 @@ fn inspect_command(args: &[String]) -> Result<()> {
         return Err(CliError::usage("usage: nts3 inspect <artifact>"));
     }
     let path = PathBuf::from(&args[0]);
+    inspect_artifact_callback_stack(&path)?;
     let report = inspect_to_reports(&path, cached_probe(&path))?;
     print!("{}", inspector::human_report(&report));
     if report.errors.is_empty() {
@@ -804,6 +813,275 @@ fn locked_package_version(name: &str) -> Option<String> {
     )
 }
 
+fn validate_callback_stack(output_dir: &Path, stem: &str) -> Result<()> {
+    let disassembly_path = output_dir.join(format!("{stem}.objdump.txt"));
+    let disassembly = fs::read_to_string(&disassembly_path).map_err(|error| {
+        CliError::failed(format!(
+            "cannot read callback disassembly {}: {error}",
+            disassembly_path.display()
+        ))
+    })?;
+    write_callback_stack_report(
+        &callback_frame_sizes(&disassembly),
+        &output_dir.join(format!("{stem}.stack.txt")),
+    )
+}
+
+fn inspect_artifact_callback_stack(path: &Path) -> Result<()> {
+    let data = fs::read(path)
+        .map_err(|error| CliError::failed(format!("cannot read {}: {error}", path.display())))?;
+    let file = object::File::parse(&*data)
+        .map_err(|error| CliError::failed(format!("cannot parse callback symbols: {error}")))?;
+    let symbols = file
+        .dynamic_symbols()
+        .filter_map(|symbol| {
+            let name = symbol.name().ok()?;
+            (name.starts_with("unit_") && name != "unit_header")
+                .then(|| (name.to_owned(), (symbol.address() & !1, symbol.size())))
+        })
+        .collect::<std::collections::BTreeMap<_, _>>();
+
+    let objdump = tool("NTS3_OBJDUMP", "arm-none-eabi-objdump");
+    let mut disassembly = String::new();
+    for callback in EXPORTS
+        .iter()
+        .copied()
+        .filter(|symbol| symbol.starts_with("unit_") && *symbol != "unit_header")
+    {
+        let Some((start, size)) = symbols.get(callback).copied() else {
+            return Err(CliError::failed(format!(
+                "no dynamic symbol range for `{callback}` during stack inspection"
+            )));
+        };
+        if size == 0 {
+            return Err(CliError::failed(format!(
+                "dynamic symbol `{callback}` has zero size during stack inspection"
+            )));
+        }
+        let output = Command::new(&objdump)
+            .arg("-d")
+            .arg(format!("--start-address={start:#x}"))
+            .arg(format!("--stop-address={:#x}", start.saturating_add(size)))
+            .arg(path)
+            .output()
+            .map_err(|error| {
+                CliError::failed(format!(
+                    "failed to launch {} for stack inspection: {error}",
+                    objdump.to_string_lossy()
+                ))
+            })?;
+        if !output.status.success() {
+            return Err(CliError {
+                code: status_code(output.status),
+                message: format!(
+                    "{} failed during stack inspection: {}",
+                    objdump.to_string_lossy(),
+                    String::from_utf8_lossy(&output.stderr).trim()
+                ),
+            });
+        }
+        disassembly.push_str(&String::from_utf8_lossy(&output.stdout));
+        disassembly.push('\n');
+    }
+    let parent = path.parent().unwrap_or_else(|| Path::new("."));
+    let stem = path
+        .file_stem()
+        .and_then(|value| value.to_str())
+        .unwrap_or("artifact");
+    write_callback_stack_report(
+        &callback_frame_sizes(&disassembly),
+        &parent.join(format!("{stem}.stack.txt")),
+    )
+}
+
+fn write_callback_stack_report(
+    frames: &std::collections::BTreeMap<String, u64>,
+    report_path: &Path,
+) -> Result<()> {
+    let mut report = format!(
+        "NTS-3 callback own-frame stack policy\nlimit_bytes={}\n",
+        CALLBACK_FRAME_LIMIT_BYTES
+    );
+    let mut errors = Vec::new();
+    for callback in EXPORTS
+        .iter()
+        .copied()
+        .filter(|symbol| symbol.starts_with("unit_") && *symbol != "unit_header")
+    {
+        let Some(bytes) = frames.get(callback).copied() else {
+            errors.push(format!("no disassembly frame measurement for `{callback}`"));
+            continue;
+        };
+        let status = if bytes <= CALLBACK_FRAME_LIMIT_BYTES {
+            "pass"
+        } else {
+            "FAIL"
+        };
+        report.push_str(&format!("{callback}={bytes} {status}\n"));
+        if bytes > CALLBACK_FRAME_LIMIT_BYTES {
+            errors.push(format!(
+                "callback `{callback}` own frame is {bytes} bytes, exceeding the empirically tested {}-byte NTS-3 limit",
+                CALLBACK_FRAME_LIMIT_BYTES
+            ));
+        }
+    }
+    report.push_str(
+        "note=624-byte unit_init passed and 632-byte unit_init hard-locked the tested NTS-3; firmware caller and transitive callee stack remain unknown\n",
+    );
+    fs::write(report_path, report).map_err(|error| {
+        CliError::failed(format!(
+            "cannot write stack report {}: {error}",
+            report_path.display()
+        ))
+    })?;
+    if errors.is_empty() {
+        Ok(())
+    } else {
+        Err(CliError::failed(format!(
+            "callback stack policy failed: {}",
+            errors.join("; ")
+        )))
+    }
+}
+
+fn callback_frame_sizes(disassembly: &str) -> std::collections::BTreeMap<String, u64> {
+    let callbacks = EXPORTS
+        .iter()
+        .copied()
+        .filter(|symbol| symbol.starts_with("unit_") && *symbol != "unit_header")
+        .collect::<std::collections::BTreeSet<_>>();
+    let mut result = std::collections::BTreeMap::new();
+    let mut current: Option<&str> = None;
+    let mut depth = 0_u64;
+    let mut maximum = 0_u64;
+
+    for line in disassembly.lines() {
+        if let Some(name) = disassembly_label(line) {
+            if name.contains('+') {
+                continue;
+            }
+            if let Some(callback) = current.take() {
+                result.insert(callback.to_owned(), maximum);
+            }
+            current = callbacks.get(name).copied();
+            depth = 0;
+            maximum = 0;
+            continue;
+        }
+        if current.is_none() {
+            continue;
+        }
+        if let Some(adjustment) = stack_adjustment(line) {
+            if adjustment >= 0 {
+                depth = depth.saturating_add(adjustment as u64);
+                maximum = maximum.max(depth);
+            } else {
+                depth = depth.saturating_sub(adjustment.unsigned_abs());
+            }
+        }
+    }
+    if let Some(callback) = current {
+        result.insert(callback.to_owned(), maximum);
+    }
+    result
+}
+
+fn disassembly_label(line: &str) -> Option<&str> {
+    let (_, rest) = line.split_once('<')?;
+    rest.strip_suffix(">:")
+}
+
+fn stack_adjustment(line: &str) -> Option<i64> {
+    let fields = line.split_whitespace().collect::<Vec<_>>();
+    let mnemonic_index = fields.iter().position(|field| {
+        matches!(
+            *field,
+            "push"
+                | "push.w"
+                | "pop"
+                | "pop.w"
+                | "stmdb"
+                | "ldmia"
+                | "vpush"
+                | "vpop"
+                | "sub"
+                | "sub.w"
+                | "add"
+                | "add.w"
+                | "str"
+                | "str.w"
+                | "ldr"
+                | "ldr.w"
+        )
+    })?;
+    let mnemonic = fields[mnemonic_index];
+    let operands = fields[mnemonic_index + 1..].join(" ");
+    match mnemonic {
+        "push" | "push.w" => register_list_bytes(&operands, 4).map(|value| value as i64),
+        "pop" | "pop.w" => register_list_bytes(&operands, 4).map(|value| -(value as i64)),
+        "stmdb" if operands.starts_with("sp!,") => {
+            register_list_bytes(&operands, 4).map(|value| value as i64)
+        }
+        "ldmia" if operands.starts_with("sp!,") => {
+            register_list_bytes(&operands, 4).map(|value| -(value as i64))
+        }
+        "vpush" => vector_register_list_bytes(&operands).map(|value| value as i64),
+        "vpop" => vector_register_list_bytes(&operands).map(|value| -(value as i64)),
+        "sub" | "sub.w" if operands.starts_with("sp,") => immediate(&operands),
+        "add" | "add.w" if operands.starts_with("sp,") => immediate(&operands).map(|v| -v),
+        "str" | "str.w" if operands.contains("[sp, #-") && operands.ends_with("]!") => {
+            immediate(&operands).map(i64::abs)
+        }
+        "ldr" | "ldr.w" if operands.contains("[sp], #") => immediate(&operands).map(|v| -v),
+        _ => None,
+    }
+}
+
+fn immediate(operands: &str) -> Option<i64> {
+    let start = operands.find('#')? + 1;
+    let value = operands[start..]
+        .split(|character: char| {
+            !(character.is_ascii_hexdigit() || character == 'x' || character == '-')
+        })
+        .next()?;
+    if let Some(hex) = value.strip_prefix("-0x") {
+        i64::from_str_radix(hex, 16).ok().map(|number| -number)
+    } else if let Some(hex) = value.strip_prefix("0x") {
+        i64::from_str_radix(hex, 16).ok()
+    } else {
+        value.parse().ok()
+    }
+}
+
+fn register_list_bytes(operands: &str, bytes_per_register: u64) -> Option<u64> {
+    let start = operands.find('{')? + 1;
+    let end = operands[start..].find('}')? + start;
+    let mut registers = 0_u64;
+    for item in operands[start..end].split(',').map(str::trim) {
+        if let Some((first, last)) = item.split_once('-') {
+            registers =
+                registers.checked_add(register_number(last)? - register_number(first)? + 1)?;
+        } else {
+            registers = registers.checked_add(1)?;
+        }
+    }
+    registers.checked_mul(bytes_per_register)
+}
+
+fn vector_register_list_bytes(operands: &str) -> Option<u64> {
+    let start = operands.find('{')? + 1;
+    let register = operands[start..].trim_start().chars().next()?;
+    register_list_bytes(operands, if register == 'd' { 8 } else { 4 })
+}
+
+fn register_number(register: &str) -> Option<u64> {
+    register
+        .trim()
+        .trim_start_matches(|character: char| character.is_ascii_alphabetic())
+        .parse()
+        .ok()
+}
+
 fn post_link_sanity(output_dir: &Path, stem: &str) -> Result<()> {
     let readelf = fs::read_to_string(output_dir.join(format!("{stem}.readelf.txt")))
         .map_err(|error| CliError::failed(format!("cannot read ELF report: {error}")))?;
@@ -814,6 +1092,7 @@ fn post_link_sanity(output_dir: &Path, stem: &str) -> Result<()> {
         "Type:                              DYN (Shared object file)",
         "Machine:                           ARM",
         "Version5 EABI, hard-float ABI",
+        "Tag_FP_arch: VFPv4-D16",
     ] {
         if !readelf.contains(invariant) {
             return Err(CliError::failed(format!(
@@ -913,7 +1192,13 @@ fn find_rlib(directory: &Path, stem: &str) -> Result<PathBuf> {
     Ok(matches.remove(0))
 }
 
-fn report(output_dir: &Path, stem: &str, unit: &Path, transcript: &mut Transcript) -> Result<()> {
+fn report(
+    output_dir: &Path,
+    stem: &str,
+    unit: &Path,
+    elf: &Path,
+    transcript: &mut Transcript,
+) -> Result<()> {
     let reports = [
         (
             "NTS3_READELF",
@@ -952,6 +1237,32 @@ fn report(output_dir: &Path, stem: &str, unit: &Path, transcript: &mut Transcrip
                 message: format!("{} failed", program.to_string_lossy()),
             });
         }
+    }
+
+    // Stack analysis uses the unstripped ELF so local function symbols prevent
+    // unrelated helpers from being attributed to the nearest exported callback.
+    let program = tool("NTS3_OBJDUMP", "arm-none-eabi-objdump");
+    let path = output_dir.join(format!("{stem}.objdump.txt"));
+    let args = [OsString::from("-d"), elf.as_os_str().to_owned()];
+    transcript.record(&program, &args, &[])?;
+    let file = fs::File::create(&path).map_err(|error| {
+        CliError::failed(format!("cannot create report {}: {error}", path.display()))
+    })?;
+    let status = Command::new(&program)
+        .args(&args)
+        .stdout(Stdio::from(file))
+        .status()
+        .map_err(|error| {
+            CliError::failed(format!(
+                "failed to launch {}: {error}",
+                program.to_string_lossy()
+            ))
+        })?;
+    if !status.success() {
+        return Err(CliError {
+            code: status_code(status),
+            message: format!("{} failed", program.to_string_lossy()),
+        });
     }
     Ok(())
 }
@@ -1021,6 +1332,7 @@ fn doctor(args: &[String]) -> Result<()> {
         ("NTS3_READELF", "arm-none-eabi-readelf"),
         ("NTS3_NM", "arm-none-eabi-nm"),
         ("NTS3_SIZE", "arm-none-eabi-size"),
+        ("NTS3_OBJDUMP", "arm-none-eabi-objdump"),
     ] {
         let version = capture(&tool(variable, executable), &["--version"], executable)?;
         if !version.contains(BINUTILS_VERSION) {
@@ -1228,6 +1540,73 @@ mod tests {
         for invalid in ["", "Smooth", "a_b", "-a", "a-", "a--b"] {
             assert!(!valid_package_name(invalid), "{invalid}");
         }
+    }
+
+    #[test]
+    fn callback_stack_parser_measures_thumb_register_and_local_frames() {
+        let disassembly = r#"
+00000cf0 <unit_init>:
+ cf0: b5f0       push {r4, r5, r6, r7, lr}
+ cf4: e92d 0f80  stmdb sp!, {r7, r8, r9, sl, fp}
+ cf8: ed2d 8b02  vpush {d8}
+ cfc: f5ad 7d14  sub.w sp, sp, #592
+ d00: f50d 7d14  add.w sp, sp, #592
+ d04: ecbd 8b02  vpop {d8}
+ d08: e8bd 0f00  ldmia.w sp!, {r8, r9, sl, fp}
+ d0c: bdf0       pop {r4, r5, r6, r7, pc}
+00000d10 <unit_render>:
+ d10: b5f0       push {r4, r5, r6, r7, lr}
+ d14: f84d bd04  str.w fp, [sp, #-4]!
+ d18: f85d bb04  ldr.w fp, [sp], #4
+ d1c: bdf0       pop {r4, r5, r6, r7, pc}
+"#;
+        let frames = callback_frame_sizes(disassembly);
+        assert_eq!(frames.get("unit_init"), Some(&640));
+        assert_eq!(frames.get("unit_render"), Some(&24));
+        assert!(frames["unit_init"] > CALLBACK_FRAME_LIMIT_BYTES);
+        assert!(frames["unit_render"] <= CALLBACK_FRAME_LIMIT_BYTES);
+    }
+
+    #[test]
+    fn callback_stack_policy_rejects_oversized_exported_frame() {
+        let directory = std::env::temp_dir().join(format!(
+            "nts3-stack-policy-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir_all(&directory).unwrap();
+        let mut disassembly = String::new();
+        for (index, callback) in EXPORTS
+            .iter()
+            .copied()
+            .filter(|symbol| symbol.starts_with("unit_") && *symbol != "unit_header")
+            .enumerate()
+        {
+            disassembly.push_str(&format!("{:08x} <{callback}>:\n", 0x1000 + index * 16));
+            disassembly.push_str(" 1000: b580 push {r7, lr}\n");
+            if callback == "unit_init" {
+                disassembly.push_str(" 1002: f5ad 7d14 sub.w sp, sp, #632\n");
+                disassembly.push_str(" 1006: f50d 7d14 add.w sp, sp, #632\n");
+            }
+            disassembly.push_str(" 100a: bd80 pop {r7, pc}\n");
+        }
+        fs::write(directory.join("fixture.objdump.txt"), disassembly).unwrap();
+        let error = validate_callback_stack(&directory, "fixture").unwrap_err();
+        assert!(error.message.contains("`unit_init` own frame is 640 bytes"));
+        assert!(error.message.contains("624-byte NTS-3 limit"));
+        let report = fs::read_to_string(directory.join("fixture.stack.txt")).unwrap();
+        assert!(report.contains("unit_init=640 FAIL"));
+        fs::remove_dir_all(directory).unwrap();
+    }
+
+    #[test]
+    fn immediate_parser_accepts_decimal_hex_and_negative_predecrement() {
+        assert_eq!(immediate("sp, sp, #144 ; comment"), Some(144));
+        assert_eq!(immediate("sp, sp, #0x90"), Some(144));
+        assert_eq!(immediate("fp, [sp, #-4]!"), Some(-4));
     }
 
     #[test]
