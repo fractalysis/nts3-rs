@@ -6,7 +6,7 @@ use serde::Deserialize;
 use std::env;
 use std::ffi::{OsStr, OsString};
 use std::fs;
-use std::io::Write;
+use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitStatus, Stdio};
 
@@ -395,11 +395,17 @@ fn build(args: &[String]) -> Result<()> {
     let unit = output_dir.join(format!("{stem}.nts3unit"));
     let map = output_dir.join(format!("{stem}.map"));
     let transcript_path = output_dir.join(format!("{stem}.commands.txt"));
-    for path in [&archive, &elf, &unit, &map] {
-        if path == &archive {
-            continue;
+    for path in [&elf, &unit, &map] {
+        match fs::remove_file(path) {
+            Ok(()) => {}
+            Err(error) if error.kind() == io::ErrorKind::NotFound => {}
+            Err(error) => {
+                return Err(CliError::failed(format!(
+                    "cannot remove stale build output {}: {error}",
+                    path.display()
+                )));
+            }
         }
-        let _ = fs::remove_file(path);
     }
 
     let mut transcript = Transcript::create(&transcript_path, verbose)?;
@@ -507,13 +513,7 @@ fn build(args: &[String]) -> Result<()> {
     let cc = tool("NTS3_CC", "arm-none-eabi-gcc");
     run_command(&cc, &link_args, &[], Some(&mut transcript))?;
 
-    fs::copy(&elf, &unit).map_err(|error| {
-        CliError::failed(format!(
-            "cannot copy {} to {}: {error}",
-            elf.display(),
-            unit.display()
-        ))
-    })?;
+    copy_artifact_contents(&elf, &unit)?;
     let strip = tool("NTS3_STRIP", "arm-none-eabi-strip");
     run_command(
         &strip,
@@ -546,6 +546,39 @@ fn build(args: &[String]) -> Result<()> {
         output_dir.join(stem).display()
     );
     println!("command transcript: {}", transcript_path.display());
+    Ok(())
+}
+
+/// Copies artifact bytes without asking the filesystem to reproduce Unix mode
+/// bits. `std::fs::copy` preserves permissions with `chmod`, which can return
+/// EPERM on Windows-backed WSL2/Docker bind mounts even though ordinary reads
+/// and writes to the mount work.
+fn copy_artifact_contents(source: &Path, destination: &Path) -> Result<()> {
+    let mut input = fs::File::open(source).map_err(|error| {
+        CliError::failed(format!(
+            "cannot open artifact source {}: {error}",
+            source.display()
+        ))
+    })?;
+    let mut output = fs::File::create(destination).map_err(|error| {
+        CliError::failed(format!(
+            "cannot create artifact destination {}: {error}",
+            destination.display()
+        ))
+    })?;
+    io::copy(&mut input, &mut output).map_err(|error| {
+        CliError::failed(format!(
+            "cannot copy artifact contents from {} to {}: {error}",
+            source.display(),
+            destination.display()
+        ))
+    })?;
+    output.flush().map_err(|error| {
+        CliError::failed(format!(
+            "cannot flush artifact destination {}: {error}",
+            destination.display()
+        ))
+    })?;
     Ok(())
 }
 
