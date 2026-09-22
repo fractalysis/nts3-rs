@@ -1,0 +1,5 @@
+error: a `drywet` parameter assigned to `depth` requires `curve = "exp"` and `curve_polarity = "bipolar"`
+ --> tests/ui/parameters-fail-depth-curve.rs:4:93
+  |
+4 |     #[parameter(name="MIX", min=-1000, max=1000, default=0, parameter_type="drywet", assign="depth")]
+  |                                                                                             ^^^^^^^

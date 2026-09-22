@@ -34,4 +34,21 @@ pub struct EchoParameters {
         mapping_default = 0
     )]
     pub feedback: Parameter,
+
+    #[parameter(
+        name = "DEPTH",
+        min = -1000,
+        max = 1000,
+        center = 0,
+        default = 1000,
+        parameter_type = "drywet",
+        decimal_places = 1,
+        assign = "depth",
+        curve = "exp",
+        curve_polarity = "bipolar",
+        mapping_min = -1000,
+        mapping_max = 1000,
+        mapping_default = 1000
+    )]
+    pub depth: Parameter,
 }

@@ -51,9 +51,13 @@ letters, digits, spaces, hyphens, and underscores.
 Mapping options default to the descriptor range/default, assignment `none`,
 curve `linear`, and polarity `unipolar`. Assignments are `none`, `x`, `y`, and
 `depth`. Curves are `linear`, `exp`, `log`, `toggle`, `minclip`, and `maxclip`.
-`curve_polarity` is `unipolar` or `bipolar`. Mapping endpoints may be inverted,
-but both endpoints and `mapping_default` must remain inside the descriptor
-range.
+`curve_polarity` is `unipolar` or `bipolar`. A `drywet` parameter assigned to
+`depth` must explicitly use `curve = "exp"` and
+`curve_polarity = "bipolar"`; the derive rejects other combinations because
+they do not produce a working NTS-3 FX DEPTH dry/wet mapping. Other parameter
+types may use the depth control with any supported curve. Mapping endpoints
+may be inverted, but both endpoints and `mapping_default` must remain inside
+the descriptor range.
 
 ## Stable indices and presets
 

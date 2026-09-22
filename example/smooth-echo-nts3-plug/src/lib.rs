@@ -45,6 +45,24 @@ pub struct EchoParameters {
         mapping_default = 0
     )]
     pub feedback: Parameter,
+
+    /// The hardware FX DEPTH slider controls the final dry/wet balance.
+    #[parameter(
+        name = "DEPTH",
+        min = -1000,
+        max = 1000,
+        center = 0,
+        default = 1000,
+        parameter_type = "drywet",
+        decimal_places = 1,
+        assign = "depth",
+        curve = "exp",
+        curve_polarity = "bipolar",
+        mapping_min = -1000,
+        mapping_max = 1000,
+        mapping_default = 1000
+    )]
+    pub depth: Parameter,
 }
 
 /// Only DSP and device-event state lives in the plugin. The framework owns the
@@ -119,6 +137,7 @@ impl Nts3Plugin for EchoPlug {
             let [input_l, input_r] = frame.input();
             let time = parameters.time_ms.next_plain() * 0.001;
             let feedback = parameters.feedback.normalized();
+            let wet_mix = parameters.depth.normalized();
 
             if feedback > 0.99 {
                 // Near-unity feedback freezes the existing delay contents.
@@ -141,9 +160,13 @@ impl Nts3Plugin for EchoPlug {
                 self.last_sample_r = input_r + delayed_r * feedback;
             }
 
+            let wet_l = self.highpass_l.tick(&Frame::from([self.last_sample_l]))[0];
+            let wet_r = self.highpass_r.tick(&Frame::from([self.last_sample_r]))[0];
+            let dry_mix = 1.0 - wet_mix;
+
             frame.write([
-                self.highpass_l.tick(&Frame::from([self.last_sample_l]))[0],
-                self.highpass_r.tick(&Frame::from([self.last_sample_r]))[0],
+                input_l * dry_mix + wet_l * wet_mix,
+                input_r * dry_mix + wet_r * wet_mix,
             ]);
         }
     }

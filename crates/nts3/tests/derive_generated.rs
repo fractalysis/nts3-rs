@@ -31,6 +31,23 @@ struct EchoParameters {
         mapping_default = 0
     )]
     feedback: Parameter,
+
+    #[parameter(
+        name = "DEPTH",
+        min = -1000,
+        max = 1000,
+        center = 0,
+        default = 1000,
+        parameter_type = "drywet",
+        decimal_places = 1,
+        assign = "depth",
+        curve = "exp",
+        curve_polarity = "bipolar",
+        mapping_min = -1000,
+        mapping_max = 1000,
+        mapping_default = 1000
+    )]
+    depth: Parameter,
 }
 
 #[derive(Nts3Parameters)]
@@ -76,7 +93,7 @@ fn bytes_of<T>(value: &T) -> &[u8] {
 
 #[test]
 fn smooth_echo_metadata_has_exact_sdk_bytes_and_padding() {
-    assert_eq!(EchoParameters::COUNT, 2);
+    assert_eq!(EchoParameters::COUNT, 3);
 
     let descriptor_bytes = bytes_of(&EchoParameters::DESCRIPTORS);
     let mut expected_descriptors = [0u8; 8 * 32];
@@ -93,6 +110,14 @@ fn smooth_echo_metadata_has_exact_sdk_bytes_and_padding() {
     expected_descriptors[feedback + 8] = 1;
     expected_descriptors[feedback + 9] = 0x11;
     expected_descriptors[feedback + 10..feedback + 18].copy_from_slice(b"FEEDBACK");
+
+    let depth = 64;
+    expected_descriptors[depth..depth + 2].copy_from_slice(&(-1000_i16).to_le_bytes());
+    expected_descriptors[depth + 2..depth + 4].copy_from_slice(&1000_i16.to_le_bytes());
+    expected_descriptors[depth + 6..depth + 8].copy_from_slice(&1000_i16.to_le_bytes());
+    expected_descriptors[depth + 8] = 14;
+    expected_descriptors[depth + 9] = 0x11;
+    expected_descriptors[depth + 10..depth + 15].copy_from_slice(b"DEPTH");
     assert_eq!(descriptor_bytes, expected_descriptors);
 
     let mapping_bytes = bytes_of(&EchoParameters::MAPPINGS);
@@ -105,6 +130,11 @@ fn smooth_echo_metadata_has_exact_sdk_bytes_and_padding() {
     expected_mappings[8] = 2;
     expected_mappings[9] = 0;
     expected_mappings[12..14].copy_from_slice(&1000i16.to_le_bytes());
+    expected_mappings[16] = 3;
+    expected_mappings[17] = 0x81;
+    expected_mappings[18..20].copy_from_slice(&(-1000_i16).to_le_bytes());
+    expected_mappings[20..22].copy_from_slice(&1000_i16.to_le_bytes());
+    expected_mappings[22..24].copy_from_slice(&1000_i16.to_le_bytes());
     assert_eq!(mapping_bytes, expected_mappings);
 }
 
@@ -113,16 +143,20 @@ fn defaults_dispatch_and_smoothing_come_from_attributes() {
     let mut parameters = EchoParameters::default();
     assert_eq!(parameters.time_ms.raw(), 500);
     assert_eq!(parameters.feedback.raw(), 0);
+    assert_eq!(parameters.depth.raw(), 1_000);
     assert_eq!(parameters.get(0), Some(500));
     assert_eq!(parameters.get(1), Some(0));
-    assert_eq!(parameters.get(2), None);
+    assert_eq!(parameters.get(2), Some(1_000));
+    assert_eq!(parameters.get(3), None);
 
     parameters.initialize_smoothers(48_000.0);
     assert!(parameters.set(0, 2_000));
     assert!(parameters.set(1, 2_000));
+    assert!(parameters.set(2, -2_000));
     assert!(!parameters.set(8, 20));
     assert_eq!(parameters.get(0), Some(2_000));
     assert_eq!(parameters.get(1), Some(1_000));
+    assert_eq!(parameters.get(2), Some(-1_000));
 
     parameters.begin_block();
     let first = parameters.time_ms.next_plain();

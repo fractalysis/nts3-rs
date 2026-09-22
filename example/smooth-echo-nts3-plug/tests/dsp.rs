@@ -4,9 +4,10 @@ use core::ptr;
 use core::sync::atomic::{AtomicUsize, Ordering};
 
 use nts3_sys::{
-    GENERICFX_CURVE_EXP, GENERICFX_CURVE_LINEAR, GENERICFX_PARAM_ASSIGN_X,
-    GENERICFX_PARAM_ASSIGN_Y, UNIT_API_2_0_0, UNIT_ERR_NONE, UNIT_TARGET_NTS3_KAOSS_GENERICFX,
-    UnitRuntimeDescriptor, UnitRuntimeGenericfxContext, UnitRuntimeHooks,
+    GENERICFX_CURVE_EXP, GENERICFX_CURVE_LINEAR, GENERICFX_PARAM_ASSIGN_DEPTH,
+    GENERICFX_PARAM_ASSIGN_X, GENERICFX_PARAM_ASSIGN_Y, UNIT_API_2_0_0, UNIT_ERR_NONE,
+    UNIT_PARAM_TYPE_DRYWET, UNIT_TARGET_NTS3_KAOSS_GENERICFX, UnitRuntimeDescriptor,
+    UnitRuntimeGenericfxContext, UnitRuntimeHooks,
 };
 use smooth_echo::{
     unit_get_param_value, unit_header, unit_init, unit_render, unit_reset, unit_set_param_value,
@@ -159,13 +160,18 @@ fn smooth_echo_dsp_metadata_memory_and_allocation_contract() {
     let common = unit_header.common();
     let descriptors = common.params();
     let mappings = unit_header.default_mappings();
-    assert_eq!(common.num_params(), 2);
+    assert_eq!(common.num_params(), 3);
     assert_eq!(descriptors[0].min(), 1);
     assert_eq!(descriptors[0].max(), 2_000);
     assert_eq!(descriptors[0].init(), 500);
     assert_eq!(descriptors[1].min(), 0);
     assert_eq!(descriptors[1].max(), 1_000);
     assert_eq!(descriptors[1].init(), 0);
+    assert_eq!(descriptors[2].min(), -1_000);
+    assert_eq!(descriptors[2].max(), 1_000);
+    assert_eq!(descriptors[2].center(), 0);
+    assert_eq!(descriptors[2].init(), 1_000);
+    assert_eq!(descriptors[2].parameter_type(), UNIT_PARAM_TYPE_DRYWET);
     assert_eq!(mappings[0].assign(), GENERICFX_PARAM_ASSIGN_X);
     assert_eq!(mappings[0].curve().curve(), GENERICFX_CURVE_EXP);
     assert_eq!(
@@ -177,6 +183,13 @@ fn smooth_echo_dsp_metadata_memory_and_allocation_contract() {
     assert_eq!(
         (mappings[1].min(), mappings[1].max(), mappings[1].value()),
         (0, 1_000, 0)
+    );
+    assert_eq!(mappings[2].assign(), GENERICFX_PARAM_ASSIGN_DEPTH);
+    assert_eq!(mappings[2].curve().curve(), GENERICFX_CURVE_EXP);
+    assert_eq!(mappings[2].curve().polarity(), 1);
+    assert_eq!(
+        (mappings[2].min(), mappings[2].max(), mappings[2].value()),
+        (-1_000, 1_000, 1_000)
     );
 
     let mut expected_descriptors = [0_u8; 8 * 32];
@@ -190,6 +203,12 @@ fn smooth_echo_dsp_metadata_memory_and_allocation_contract() {
     expected_descriptors[40] = 1; // percent
     expected_descriptors[41] = 0x11; // one decimal place
     expected_descriptors[42..50].copy_from_slice(b"FEEDBACK");
+    expected_descriptors[64..66].copy_from_slice(&(-1_000_i16).to_le_bytes());
+    expected_descriptors[66..68].copy_from_slice(&1_000_i16.to_le_bytes());
+    expected_descriptors[70..72].copy_from_slice(&1_000_i16.to_le_bytes());
+    expected_descriptors[72] = UNIT_PARAM_TYPE_DRYWET;
+    expected_descriptors[73] = 0x11; // one decimal place
+    expected_descriptors[74..79].copy_from_slice(b"DEPTH");
     assert_eq!(bytes_of(&descriptors), expected_descriptors);
 
     let mut expected_mappings = [0_u8; 8 * 8];
@@ -201,6 +220,11 @@ fn smooth_echo_dsp_metadata_memory_and_allocation_contract() {
     expected_mappings[8] = GENERICFX_PARAM_ASSIGN_Y;
     expected_mappings[9] = GENERICFX_CURVE_LINEAR;
     expected_mappings[12..14].copy_from_slice(&1_000_i16.to_le_bytes());
+    expected_mappings[16] = GENERICFX_PARAM_ASSIGN_DEPTH;
+    expected_mappings[17] = 0x80 | GENERICFX_CURVE_EXP;
+    expected_mappings[18..20].copy_from_slice(&(-1_000_i16).to_le_bytes());
+    expected_mappings[20..22].copy_from_slice(&1_000_i16.to_le_bytes());
+    expected_mappings[22..24].copy_from_slice(&1_000_i16.to_le_bytes());
     assert_eq!(bytes_of(&mappings), expected_mappings);
 
     // Silence remains silent and finite at the declared defaults.
@@ -209,10 +233,22 @@ fn smooth_echo_dsp_metadata_memory_and_allocation_contract() {
     initialize();
     assert_eq!(unit_get_param_value(0), 500);
     assert_eq!(unit_get_param_value(1), 0);
+    assert_eq!(unit_get_param_value(2), 1_000);
     render_separate(&silence, &mut silence_out);
     teardown();
     assert!(silence_out.iter().all(|sample| sample.is_finite()));
     assert!(maximum_magnitude(&silence_out) <= 1.0e-7);
+
+    // The bottom of the FX DEPTH slider is fully dry. DSP still runs, but the
+    // final mix must pass the original stereo input through unchanged.
+    let dry_input = [0.75_f32, -0.25, -0.5, 0.125];
+    let mut dry_output = [0.0_f32; 4];
+    initialize();
+    unit_set_param_value(2, -1_000);
+    unit_reset();
+    render_separate(&dry_input, &mut dry_output);
+    teardown();
+    assert_eq!(dry_output, dry_input);
 
     // At 100 ms and 50% feedback, the first repeat begins at 4,800 samples.
     let impulse_frames = 6_000;
@@ -331,6 +367,6 @@ fn smooth_echo_dsp_metadata_memory_and_allocation_contract() {
     teardown();
     assert!(peak < 16.0, "unexpected long-run peak {peak}");
 
-    assert_eq!(ALLOC_CALLS.load(Ordering::SeqCst), 7);
-    assert_eq!(FREE_CALLS.load(Ordering::SeqCst), 7);
+    assert_eq!(ALLOC_CALLS.load(Ordering::SeqCst), 8);
+    assert_eq!(FREE_CALLS.load(Ordering::SeqCst), 8);
 }

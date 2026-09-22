@@ -15,6 +15,10 @@ const MAX_PARAMETERS: usize = 8;
 const PARAMETER_NAME_LEN: usize = 21;
 const UNIT_NAME_LEN: usize = 19;
 const PLATFORM_SDRAM_LIMIT: u64 = 3 * 1024 * 1024;
+const PARAMETER_TYPE_DRYWET: u8 = 14;
+const GENERICFX_ASSIGN_DEPTH: u8 = 3;
+const GENERICFX_CURVE_EXP: u8 = 1;
+const GENERICFX_CURVE_BIPOLAR: u8 = 1;
 
 /// Generates the complete NTS-3 genericfx header and callback adapter for one
 /// concrete `Nts3Plugin` implementation.
@@ -914,6 +918,15 @@ fn validate_parameter(
             format!("unsupported curve_polarity `{polarity_name}`"),
         )
     })?;
+    if parameter_type == PARAMETER_TYPE_DRYWET
+        && assign == GENERICFX_ASSIGN_DEPTH
+        && (curve_value != GENERICFX_CURVE_EXP || polarity != GENERICFX_CURVE_BIPOLAR)
+    {
+        return Err(syn::Error::new(
+            assign_span,
+            "a `drywet` parameter assigned to `depth` requires `curve = \"exp\"` and `curve_polarity = \"bipolar\"`",
+        ));
+    }
     let curve = curve_value | (polarity << 7);
 
     let mapping_min = match raw.mapping_min {
