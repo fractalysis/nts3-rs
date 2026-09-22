@@ -1,0 +1,16 @@
+[package]
+name = "diopser-nts3-plug"
+version = "0.1.0"
+edition = "2024"
+authors = ["Robbert van der Helm <mail@robbertvanderhelm.nl>"]
+license = "GPL-3.0-or-later"
+homepage = "https://github.com/robbert-vdh/nih-plug/tree/master/plugins/diopser"
+publish = false
+
+[dependencies]
+nts3 = { path = "../../crates/nts3" }
+libm = "0.2.15"
+
+[lib]
+name = "diopser_nts3"
+path = "src/lib.rs"

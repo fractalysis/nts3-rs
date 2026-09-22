@@ -77,6 +77,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "diopser-nts3-plug"
+version = "0.1.0"
+dependencies = [
+ "libm",
+ "nts3",
+]
+
+[[package]]
 name = "dyn-clone"
 version = "1.0.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
