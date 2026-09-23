@@ -10,6 +10,7 @@ members = [
     "fixtures/touch-probe",
     "example/smooth-echo-nts3-plug",
     "example/diopser-nts3-plug",
+    "example/ott-nts3-plug",
 ]
 exclude = [
     "example/smooth-echo-nih-plug",

@@ -1,0 +1,13 @@
+[package]
+name = "ott-nts3-plug"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+nts3 = { path = "../../crates/nts3" }
+libm = "0.2.15"
+
+[lib]
+name = "ott_nts3"
+path = "src/lib.rs"
