@@ -136,6 +136,9 @@ impl Nts3Plugin for DiopserPlug {
     }
 }
 
+#[cfg(feature = "web")]
+nts3_rs_wasm::export_wasm_effect!(DiopserPlug);
+
 impl DiopserPlug {
     fn update_coefficients(&mut self, frequency_hz: f32, resonance: f32) {
         // Keep the Audio EQ Cookbook preconditions true if a future runtime

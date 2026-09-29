@@ -9,6 +9,21 @@ pub struct InitContext<'runtime> {
 }
 
 impl InitContext<'_> {
+    /// Constructs initialization data for non-hardware hosts and adapters.
+    #[doc(hidden)]
+    pub const fn for_host(
+        sample_rate_hz: u32,
+        maximum_frames: usize,
+        touch_area: [u32; 2],
+    ) -> Self {
+        Self {
+            sample_rate_hz,
+            maximum_frames,
+            touch_area,
+            _lifetime: core::marker::PhantomData,
+        }
+    }
+
     pub const fn sample_rate_hz(&self) -> u32 {
         self.sample_rate_hz
     }

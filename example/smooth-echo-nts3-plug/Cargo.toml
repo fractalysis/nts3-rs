@@ -5,8 +5,13 @@ edition = "2024"
 authors = ["Fraccy (ssh)"]
 publish = false
 
+[features]
+default = []
+web = ["dep:nts3-rs-wasm"]
+
 [dependencies]
 nts3 = { path = "../../crates/nts3" }
+nts3-rs-wasm = { path = "../../crates/nts3-rs-wasm", optional = true }
 
 # 0.21.0 is pinned because its no_std build was verified for
 # thumbv7em-none-eabihf. FunDSP 0.22/0.23 currently need small no_std fixes.
@@ -15,6 +20,7 @@ fundsp = { version = "=0.21.0", default-features = false }
 [lib]
 name = "smooth_echo"
 path = "src/lib.rs"
+crate-type = ["rlib", "cdylib"]
 
 [dev-dependencies]
 nts3-sys = { path = "../../crates/nts3-sys" }

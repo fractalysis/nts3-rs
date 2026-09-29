@@ -7,10 +7,16 @@ license = "GPL-3.0-or-later"
 homepage = "https://github.com/robbert-vdh/nih-plug/tree/master/plugins/diopser"
 publish = false
 
+[features]
+default = []
+web = ["dep:nts3-rs-wasm"]
+
 [dependencies]
 nts3 = { path = "../../crates/nts3" }
+nts3-rs-wasm = { path = "../../crates/nts3-rs-wasm", optional = true }
 libm = "0.2.15"
 
 [lib]
 name = "diopser_nts3"
 path = "src/lib.rs"
+crate-type = ["rlib", "cdylib"]

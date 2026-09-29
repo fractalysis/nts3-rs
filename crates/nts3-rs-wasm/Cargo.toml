@@ -1,0 +1,10 @@
+[package]
+name = "nts3-rs-wasm"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+description = "Raw WebAssembly AudioWorklet adapter for nts3-rs effects"
+publish = false
+
+[dependencies]
+nts3 = { path = "../nts3" }

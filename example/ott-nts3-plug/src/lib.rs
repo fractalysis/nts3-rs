@@ -344,6 +344,9 @@ impl Nts3Plugin for OttPlug {
     }
 }
 
+#[cfg(feature = "web")]
+nts3_rs_wasm::export_wasm_effect!(OttPlug);
+
 #[cfg(test)]
 mod tests {
     use super::*;

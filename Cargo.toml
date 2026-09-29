@@ -4,6 +4,7 @@ members = [
     "crates/nts3-sys",
     "crates/nts3-macros",
     "crates/nts3",
+    "crates/nts3-rs-wasm",
     "crates/nts3-cli",
     "fixtures/parameter-derive",
     "fixtures/pass-through",

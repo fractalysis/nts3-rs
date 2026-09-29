@@ -67,6 +67,22 @@ impl<'audio> StereoBuffer<'audio> {
         })
     }
 
+    /// Builds an exact in-place stereo buffer from interleaved samples.
+    ///
+    /// This host-facing constructor is useful for adapters that invoke an
+    /// NTS-3 plugin outside the hardware callback ABI. An odd trailing sample
+    /// is rejected because every frame must contain two channels.
+    pub fn from_interleaved_in_place(samples: &'audio mut [f32]) -> Result<Self, BufferError> {
+        if samples.len() % CHANNELS != 0 {
+            return Err(BufferError::SizeOverflow);
+        }
+        let frames = samples.len() / CHANNELS;
+        let pointer = samples.as_mut_ptr();
+        // SAFETY: the slice is initialized and writable for its full length;
+        // exact in-place input/output is explicitly supported.
+        unsafe { Self::from_raw(pointer.cast_const(), pointer, ptr::null(), frames) }
+    }
+
     pub const fn len(&self) -> usize {
         self.frames
     }

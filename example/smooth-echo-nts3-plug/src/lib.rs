@@ -177,6 +177,9 @@ impl Nts3Plugin for EchoPlug {
     }
 }
 
+#[cfg(feature = "web")]
+nts3_rs_wasm::export_wasm_effect!(EchoPlug);
+
 impl EchoPlug {
     /// Demonstrates that touch activity can be consumed as an ordinary internal
     /// effect control without spending one of the eight exposed parameter slots.
