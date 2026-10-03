@@ -6,8 +6,7 @@ use core::ptr;
 use nts3_sys::{
     UNIT_ERR_API_VERSION, UNIT_ERR_GEOMETRY, UNIT_ERR_MEMORY, UNIT_ERR_NONE, UNIT_ERR_SAMPLERATE,
     UNIT_ERR_TARGET, UNIT_ERR_UNDEF, UNIT_TARGET_NTS3_KAOSS_GENERICFX, UnitRuntimeDescriptor,
-    UnitRuntimeGenericfxContext, UnitRuntimeGenericfxGetRawInputFn, UnitRuntimeHooks,
-    unit_api_is_compatible,
+    UnitRuntimeGenericfxContext, UnitRuntimeHooks, unit_api_is_compatible,
 };
 
 use crate::allocator::AllocationStats;
@@ -25,7 +24,6 @@ struct RuntimeContext {
     sample_rate_hz: u32,
     maximum_frames: usize,
     touch_area: [u32; 2],
-    get_raw_input: Option<UnitRuntimeGenericfxGetRawInputFn>,
 }
 
 impl RuntimeContext {
@@ -148,16 +146,9 @@ impl<P: Nts3Plugin> Runtime<P> {
             return Err(RenderError::FrameCountExceeded);
         }
 
-        // The hook is intentionally called for every valid render. Only its
-        // result, scoped into the local buffer, is retained.
-        let raw_input = match self.context.get_raw_input {
-            Some(get_raw_input) => {
-                // SAFETY: the function pointer came from the validated genericfx
-                // runtime context and is invoked only during this render call.
-                unsafe { get_raw_input() }
-            }
-            None => ptr::null(),
-        };
+        // The NTS-3 SDK raw-input hook is broken. Never invoke it, for any
+        // effect; plugins receive only the normal render input.
+        let raw_input = ptr::null();
 
         // SAFETY: the caller upholds the SDK render pointer contract. The local
         // buffer cannot escape `process`, and validates shape/overlap before use.
@@ -489,7 +480,6 @@ pub(crate) mod host {
             sample_rate_hz: SAMPLE_RATE_HZ,
             maximum_frames: PROBE_FRAMES,
             touch_area: [1024, 1024],
-            get_raw_input: None,
         };
         let (initialized, exercised) = arena.run_sealed(
             || Runtime::<P>::construct(context).map_err(|_| "plugin initialization failed"),
@@ -623,7 +613,6 @@ unsafe fn validate_descriptor(
             sample_rate_hz: descriptor.sample_rate(),
             maximum_frames: descriptor.frames_per_buffer() as usize,
             touch_area: [genericfx.touch_area_width(), genericfx.touch_area_height()],
-            get_raw_input: genericfx.get_raw_input(),
         },
     })
 }
@@ -657,7 +646,6 @@ mod tests {
     static ALLOCATIONS: AtomicUsize = AtomicUsize::new(0);
     static FREES: AtomicUsize = AtomicUsize::new(0);
     static RAW_CALLS: AtomicUsize = AtomicUsize::new(0);
-    static RAW_POINTER_SELECT: AtomicUsize = AtomicUsize::new(0);
     static TOUCH_BITS: AtomicU32 = AtomicU32::new(0);
     static TEMPO_BITS: AtomicU32 = AtomicU32::new(0);
     static TICKS: AtomicU32 = AtomicU32::new(0);
@@ -669,8 +657,6 @@ mod tests {
     struct Arena([u8; 16 * 1024]);
 
     static mut ARENA: Arena = Arena([0; 16 * 1024]);
-    static RAW_A: [f32; 4] = [10.0, 11.0, 12.0, 13.0];
-    static RAW_B: [f32; 4] = [20.0, 21.0, 22.0, 23.0];
 
     unsafe extern "C" fn allocate(size: usize) -> *mut u8 {
         ALLOCATIONS.fetch_add(1, Ordering::SeqCst);
@@ -697,11 +683,8 @@ mod tests {
 
     unsafe extern "C" fn get_raw_input() -> *const f32 {
         RAW_CALLS.fetch_add(1, Ordering::SeqCst);
-        if RAW_POINTER_SELECT.fetch_xor(1, Ordering::SeqCst) == 0 {
-            RAW_A.as_ptr()
-        } else {
-            RAW_B.as_ptr()
-        }
+        // Deliberately unusable: the runtime must never invoke this hook.
+        ptr::null()
     }
 
     struct TestParameters;
@@ -754,11 +737,9 @@ mod tests {
         }
 
         fn process(&mut self, _parameters: &mut Self::Parameters, buffer: &mut StereoBuffer<'_>) {
-            let mut raw = buffer.raw_input().unwrap().frames();
+            assert!(buffer.raw_input().is_none());
             for mut frame in buffer.frames_mut() {
-                let input = frame.input();
-                let raw = raw.next().unwrap();
-                frame.write([input[0] + raw[0], input[1] + raw[1]]);
+                frame.write(frame.input());
             }
         }
 
@@ -1093,14 +1074,13 @@ mod tests {
     }
 
     #[test]
-    fn lifecycle_render_raw_refresh_touch_and_tempo_dispatch() {
+    fn lifecycle_render_never_calls_raw_input_touch_and_tempo_dispatch() {
         let _guard = TEST_SERIAL
             .lock()
             .unwrap_or_else(|error| error.into_inner());
         ALLOCATIONS.store(0, Ordering::SeqCst);
         FREES.store(0, Ordering::SeqCst);
         RAW_CALLS.store(0, Ordering::SeqCst);
-        RAW_POINTER_SELECT.store(0, Ordering::SeqCst);
         TOUCH_BITS.store(0, Ordering::SeqCst);
         LIFECYCLE_BITS.store(0, Ordering::SeqCst);
         CONSTRUCTION_ORDER.store(0, Ordering::SeqCst);
@@ -1139,24 +1119,24 @@ mod tests {
                 .render(input.as_ptr(), second.as_mut_ptr(), 2)
                 .unwrap();
         }
-        assert_eq!(first, [11.0, 13.0, 15.0, 17.0]);
-        assert_eq!(second, [21.0, 23.0, 25.0, 27.0]);
-        assert_eq!(RAW_CALLS.load(Ordering::SeqCst), 2);
+        assert_eq!(first, input);
+        assert_eq!(second, input);
+        assert_eq!(RAW_CALLS.load(Ordering::SeqCst), 0);
 
-        // A zero-frame render still refreshes raw input but needs no storage.
+        // A zero-frame render needs no storage and never calls raw input.
         // SAFETY: zero frames permit null audio pointers and perform no access.
         unsafe {
             controller.render(ptr::null(), ptr::null_mut(), 0).unwrap();
         }
-        assert_eq!(RAW_CALLS.load(Ordering::SeqCst), 3);
+        assert_eq!(RAW_CALLS.load(Ordering::SeqCst), 0);
 
-        // Frame bounds are checked before hook invocation or pointer access.
+        // Frame bounds are checked before buffer construction or pointer access.
         // SAFETY: rejected before accessing the intentionally null pointers.
         assert_eq!(
             unsafe { controller.render(ptr::null(), ptr::null_mut(), 3) },
             Err(RenderError::FrameCountExceeded)
         );
-        assert_eq!(RAW_CALLS.load(Ordering::SeqCst), 3);
+        assert_eq!(RAW_CALLS.load(Ordering::SeqCst), 0);
 
         for phase in [
             UNIT_TOUCH_PHASE_BEGAN,
@@ -1251,9 +1231,9 @@ mod tests {
         assert_eq!(
             core::mem::size_of::<Runtime<ManualPlugin>>(),
             if cfg!(target_pointer_width = "64") {
-                80
+                72
             } else {
-                64
+                60
             }
         );
         let defaults = ManualParameters::default();

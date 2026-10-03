@@ -16,8 +16,10 @@ Target-safe framework core for Korg NTS-3 `genericfx` units.
   C callback surface, runtime singleton, target allocator, and panic policy.
 
 The runtime validates the SDK descriptor before state construction, owns plugin
-and parameter state, refreshes optional raw input for each render, bounds frame
-counts, and dispatches all lifecycle and parameter callbacks. Generated code
+and parameter state, bounds frame counts, and dispatches all lifecycle and
+parameter callbacks. **NTS-3 firmware 1.1 provides no audio input while the pad
+is untouched.** The runtime never calls its broken `get_raw_input` hook, so
+`StereoBuffer::raw_input()` is always `None` in device callbacks. Generated code
 implements the sealed `Nts3Parameters` metadata/dispatch contract. Parameter
 attribute syntax, validation, and index/preset stability are documented in
 [`../../docs/parameters.md`](../../docs/parameters.md).

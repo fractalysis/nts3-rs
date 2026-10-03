@@ -1,0 +1,18 @@
+[package]
+name = "granular-freeze-nts3-plug"
+version = "0.1.5"
+edition = "2024"
+publish = false
+
+[features]
+default = []
+web = ["dep:nts3-rs-wasm"]
+
+[dependencies]
+nts3 = { path = "../../crates/nts3" }
+nts3-rs-wasm = { path = "../../crates/nts3-rs-wasm", optional = true }
+
+[lib]
+name = "granular_freeze"
+path = "src/lib.rs"
+crate-type = ["rlib", "cdylib"]

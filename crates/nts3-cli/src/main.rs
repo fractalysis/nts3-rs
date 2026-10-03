@@ -296,7 +296,7 @@ fn select_package(metadata: &Metadata, requested: Option<&str>) -> Result<Select
             target
                 .kind
                 .iter()
-                .any(|kind| kind == "lib" || kind == "staticlib")
+                .any(|kind| kind == "lib" || kind == "rlib" || kind == "staticlib")
         })
         .ok_or_else(|| {
             CliError::usage(format!(
@@ -1182,7 +1182,10 @@ fn post_link_sanity(output_dir: &Path, stem: &str) -> Result<()> {
 fn rlib_matches(path: &Path, stem: &str) -> bool {
     path.file_name()
         .and_then(OsStr::to_str)
-        .is_some_and(|name| name.starts_with(&format!("lib{stem}-")) && name.ends_with(".rlib"))
+        .is_some_and(|name| {
+            name == format!("lib{stem}.rlib")
+                || (name.starts_with(&format!("lib{stem}-")) && name.ends_with(".rlib"))
+        })
 }
 
 fn remove_matching_rlibs(directory: &Path, stem: &str) -> Result<()> {
@@ -1573,6 +1576,22 @@ mod tests {
         for invalid in ["", "Smooth", "a_b", "-a", "a-", "a--b"] {
             assert!(!valid_package_name(invalid), "{invalid}");
         }
+    }
+
+    #[test]
+    fn cargo_rlib_names_support_current_and_legacy_layouts() {
+        assert!(rlib_matches(
+            Path::new("libgranular_freeze.rlib"),
+            "granular_freeze"
+        ));
+        assert!(rlib_matches(
+            Path::new("libgranular_freeze-deadbeef.rlib"),
+            "granular_freeze"
+        ));
+        assert!(!rlib_matches(
+            Path::new("libgranular_freeze.rmeta"),
+            "granular_freeze"
+        ));
     }
 
     #[test]

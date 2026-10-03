@@ -104,6 +104,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb"
 
 [[package]]
+name = "freeze-input-probe"
+version = "0.1.1"
+dependencies = [
+ "nts3",
+]
+
+[[package]]
 name = "fundsp"
 version = "0.21.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -168,6 +175,14 @@ name = "glob"
 version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e4eba85ea1d0a966a983acd07deee566e67395d2d96b6fb39e62b5a833f1eb0b"
+
+[[package]]
+name = "granular-freeze-nts3-plug"
+version = "0.1.5"
+dependencies = [
+ "nts3",
+ "nts3-rs-wasm",
+]
 
 [[package]]
 name = "hashbrown"
@@ -259,6 +274,14 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
+]
+
+[[package]]
+name = "nts3-freeze-diagnostic"
+version = "0.1.0"
+dependencies = [
+ "nts3",
+ "nts3-rs-wasm",
 ]
 
 [[package]]
