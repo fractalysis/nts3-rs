@@ -23,7 +23,7 @@ The constants are near the top of `src/lib.rs`:
 
 `GRAIN_AMOUNT` controls density through `hop = grain_length / GRAIN_AMOUNT`. If `MAX_GRAIN_SECONDS` changes, keep the `GRAIN LENGTH` parameter's `max` and `mapping_max` millisecond values in sync. Values at or above `BUFFER_SECONDS` are rejected so maximum-length grains still leave room for chaos once capture is complete.
 
-The grain window is isolated in `grain_window()`. It uses `(1 - x²)³`, a compact polynomial approximation to `exp(-3x²)` around the peak, with exact zero endpoints and no exponential calls. When replacing it, also update `GRAIN_WINDOW_MEAN`, which is used for the selected fixed-density output gain.
+The grain window is isolated in `grain_window()`. It uses `(1 - x²)³`, a compact polynomial approximation to `exp(-3x²)` around the peak, with exact zero endpoints and no exponential calls. The fixed unity output gain is peak-safe for the two steady half-overlapped windows; unlike mean normalization, it does not intermittently boost unrelated random grains above the input peak.
 
 ## Resource notes
 

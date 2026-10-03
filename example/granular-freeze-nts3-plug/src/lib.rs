@@ -22,10 +22,11 @@ const MIN_GRAIN_MILLISECONDS: f32 = 50.0;
 // dropping a spawn while grains created at the previous length finish.
 const MAX_ACTIVE_GRAINS: usize = 3;
 const RNG_SEED: u32 = 0x6d2b_79f5;
-// Integral mean of (1 - x^2)^3 over x=-1..1. This keeps the selected fixed
-// density gain near unity on average without normalizing every sample.
-const GRAIN_WINDOW_MEAN: f32 = 16.0 / 35.0;
-const GRAIN_OUTPUT_GAIN: f32 = 1.0 / (GRAIN_AMOUNT * GRAIN_WINDOW_MEAN);
+// At 2x density the two half-overlapped polynomial windows sum to at most 1.
+// Unity therefore prevents random grains from intermittently overshooting just
+// because unrelated peaks align. The previous mean-normalized gain was 1.09375
+// and could produce harsh clipping, especially at maximum chaos.
+const GRAIN_OUTPUT_GAIN: f32 = 1.0;
 
 const _: () = assert!(GRAIN_AMOUNT > 0.0 && GRAIN_AMOUNT <= 2.0);
 const _: () = assert!(MAX_GRAIN_SECONDS > 0.0 && MAX_GRAIN_SECONDS < BUFFER_SECONDS as f32);
@@ -375,12 +376,23 @@ mod tests {
     }
 
     #[test]
-    fn polynomial_window_is_symmetric_and_gaussian_shaped() {
+    fn polynomial_window_is_symmetric_gaussian_shaped_and_peak_safe() {
         assert_eq!(grain_window(0.0), 0.0);
         assert_eq!(grain_window(0.5), 1.0);
         assert_eq!(grain_window(1.0), 0.0);
         assert!((grain_window(0.25) - grain_window(0.75)).abs() < 1.0e-7);
         assert!(grain_window(0.25) < grain_window(0.375));
+
+        for step in 0..=1_000 {
+            let phase = step as f32 / 1_000.0;
+            let other_phase = if phase < 0.5 {
+                phase + 0.5
+            } else {
+                phase - 0.5
+            };
+            let combined = (grain_window(phase) + grain_window(other_phase)) * GRAIN_OUTPUT_GAIN;
+            assert!(combined <= 1.0 + 1.0e-6, "phase {phase}: {combined}");
+        }
     }
 
     #[test]
